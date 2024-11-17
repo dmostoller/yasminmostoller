@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+model comments {
+  id          Int        @id @default(autoincrement())
+  comment     String?    @db.VarChar
+  date_added  String?    @db.VarChar
+  painting_id Int?
+  user_id     Int?
+  paintings   paintings? @relation(fields: [painting_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_comments_painting_id_paintings")
+  users       users?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_comments_user_id_users")
+}
+
+model events {
+  id         Int     @id @default(autoincrement())
+  name       String? @db.VarChar
+  venue      String? @db.VarChar
+  location   String? @db.VarChar
+  details    String? @db.VarChar
+  image_url  String? @db.VarChar
+  event_date String? @db.VarChar
+  event_link String? @db.VarChar
+}
+
+model folders {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar
+  paintings paintings[]
+}
+
+model mailing_list_entries {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(100)
+  email String  @unique @db.VarChar(100)
+  votes votes[]
+}
+
+model paintings {
+  id             Int              @id @default(autoincrement())
+  title          String           @db.VarChar
+  materials      String?          @db.VarChar
+  width          Int?
+  height         Int?
+  price          String?          @db.VarChar
+  sale_price     Int?
+  image          String?          @db.VarChar
+  sold           Boolean?
+  folder_id      Int?
+  comments       comments[]
+  folders        folders?         @relation(fields: [folder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_paintings_folder_id_folders")
+  poll_paintings poll_paintings[]
+  votes          votes[]
+}
+
+model poll_paintings {
+  poll_id     Int
+  painting_id Int
+  paintings   paintings @relation(fields: [painting_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_poll_paintings_painting_id_paintings")
+  polls       polls     @relation(fields: [poll_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_poll_paintings_poll_id_polls")
+
+  @@id([poll_id, painting_id])
+}
+
+model polls {
+  id             Int              @id @default(autoincrement())
+  start_date     DateTime         @db.Timestamp(6)
+  end_date       DateTime         @db.Timestamp(6)
+  poll_paintings poll_paintings[]
+  votes          votes[]
+}
+
+model post_comments {
+  id         Int     @id @default(autoincrement())
+  comment    String? @db.VarChar
+  date_added String? @db.VarChar
+  post_id    Int?
+  user_id    Int?
+  posts      posts?  @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post_comments_post_id_posts")
+  users      users?  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_post_comments_user_id_users")
+}
+
+model posts {
+  id            Int             @id @default(autoincrement())
+  title         String?         @db.VarChar
+  content       String?         @db.VarChar
+  image_url     String?         @db.VarChar
+  video_url     String?         @db.VarChar
+  date_added    String?         @db.VarChar
+  post_comments post_comments[]
+}
+
+model users {
+  id            Int             @id @default(autoincrement())
+  username      String          @unique(map: "ix_users_username") @db.VarChar
+  password_hash String          @map("_password_hash") @db.VarChar
+  email         String?         @unique @db.VarChar
+  is_admin      Boolean?
+  comments      comments[]
+  post_comments post_comments[]
+}
+
+model votes {
+  id                   Int                  @id @default(autoincrement())
+  painting_id          Int
+  poll_id              Int
+  user_id              Int
+  paintings            paintings            @relation(fields: [painting_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_votes_painting_id_paintings")
+  polls                polls                @relation(fields: [poll_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_votes_poll_id_polls")
+  mailing_list_entries mailing_list_entries @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_votes_user_id_mailing_list_entries")
+}
