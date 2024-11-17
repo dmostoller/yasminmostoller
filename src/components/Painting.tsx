@@ -33,9 +33,7 @@ export default function Painting(props: PaintingType) {
           {sold ? (
             <span className="text-red-600">SOLD</span>
           ) : (
-            <Link href="/contact" className="text-blue-600 hover:text-blue-800">
-              ${sale_price}
-            </Link>
+            <span className="text-blue-600 hover:text-blue-800">${sale_price}</span>
           )}
         </div>
       </div>

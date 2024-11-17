@@ -1,11 +1,19 @@
-// app/api/paintings/route.ts
+// app/api/paintings/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Painting } from '@/lib/types';
 
-export async function GET() {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const paintings = await prisma.paintings.findMany({
+    const resolvedParams = await Promise.resolve(params);
+    const id = parseInt(resolvedParams.id);
+
+    if (isNaN(id)) {
+      return NextResponse.json({ error: 'Invalid painting ID' }, { status: 400 });
+    }
+
+    const painting = await prisma.paintings.findUnique({
+      where: { id },
       select: {
         id: true,
         title: true,
@@ -16,14 +24,14 @@ export async function GET() {
         image: true,
         sold: true,
         folder_id: true
-      },
-      orderBy: {
-        id: 'desc'
       }
     });
 
-    // Transform the data to match our frontend expectations
-    const formattedPaintings = paintings.map((painting: Painting) => ({
+    if (!painting) {
+      return NextResponse.json({ error: 'Painting not found' }, { status: 404 });
+    }
+
+    const formattedPainting: Painting = {
       id: painting.id.toString(),
       title: painting.title,
       materials: painting.materials || '',
@@ -31,10 +39,11 @@ export async function GET() {
       height: painting.height || 0,
       sale_price: painting.sale_price || 0,
       image: painting.image || '',
-      sold: painting.sold || false
-    }));
+      sold: painting.sold || false,
+      folder_id: painting.folder_id || 0
+    };
 
-    return NextResponse.json(formattedPaintings, {
+    return NextResponse.json(formattedPainting, {
       status: 200,
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
@@ -42,7 +51,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Database error:', error);
-    return NextResponse.json({ error: 'Failed to fetch paintings from database' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch painting' }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
