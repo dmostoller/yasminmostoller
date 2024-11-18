@@ -4,6 +4,8 @@ import './globals.css';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ClientSessionProvider from '@/context/ClientSessionProvider';
+import Script from 'next/script';
+import Head from 'next/head';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -28,12 +30,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-video-player/2.0.2/cld-video-player.min.css"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+      </Head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClientSessionProvider>
           <Nav />
           <main className="bg-white flex-grow pt-[72px]">{children}</main>
           <Footer />
         </ClientSessionProvider>
+        {/* <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-video-player/2.0.2/cld-video-player.min.js"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        /> */}
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-video-player/2.0.2/cld-video-player.min.js"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
+        <Script src="https://upload-widget.cloudinary.com/global/all.js" strategy="beforeInteractive" />
       </body>
     </html>
   );

@@ -59,7 +59,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
         <div className="flex flex-col md:flex-row">
           <div className="relative w-full md:w-1/2">
             <Image
-              src={painting.image}
+              src={painting.image || '/path/to/default/image.jpg'}
               alt={painting.title}
               width={500}
               height={500}
@@ -81,7 +81,9 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
                 <button
                   className="p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition"
                   title="Download Painting"
-                  onClick={() => handleDownload(painting.image, `${painting.title}.jpg`)}
+                  onClick={() =>
+                    handleDownload(painting.image || '/path/to/default/image.jpg', `${painting.title}.jpg`)
+                  }
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

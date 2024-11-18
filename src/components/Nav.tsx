@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
   const router = useRouter();
   const { data: session, status } = useSession();
   const user = null;
@@ -99,7 +98,7 @@ const Nav = () => {
             <NavItem href="/gallery">Gallery</NavItem>
             <NavItem href="/paintings">Paintings</NavItem>
             <NavItem href="/events">Exhibitions</NavItem>
-            <NavItem href="/blog">News</NavItem>
+            <NavItem href="/news">News</NavItem>
             <NavItem href="/about">Bio</NavItem>
             <NavItem href="/contact">Contact</NavItem>
           </div>
@@ -115,36 +114,42 @@ const Nav = () => {
               <Link
                 href="/gallery"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Gallery
               </Link>
               <Link
                 href="/paintings"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Paintings
               </Link>
               <Link
                 href="/events"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Exhibitions
               </Link>
               <Link
-                href="/blog"
+                href="/news"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                onClick={() => setIsMenuOpen(false)}
               >
                 News
               </Link>
               <Link
                 href="/about"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Bio
               </Link>
               <Link
                 href="/contact"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Contact
               </Link>
