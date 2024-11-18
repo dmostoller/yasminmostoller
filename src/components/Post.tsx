@@ -27,7 +27,7 @@ const Post: FC<PostProps> = ({ id, title, content, image_url, video_url, date_ad
         <p className="mt-4 text-gray-600">{content}</p>
         <div className="mt-6">
           <Link
-            href={`/posts/${id}`}
+            href={`/news/${id}`}
             className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-transparent border border-teal-500 text-teal-500 hover:bg-teal-50 transition-colors"
           >
             <ExternalLink className="h-5 w-5" />

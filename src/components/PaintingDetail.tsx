@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
 import fileDownload from 'js-file-download';
-// import CommentsList from '@/components/CommentsList';
+import CommentsList from '@/components/CommentsList';
 // import PaintingModal from '@/components/PaintingModal';
 import type { Painting } from '@/lib/types';
 import { useSession } from 'next-auth/react';
@@ -29,7 +29,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
     if (window.confirm('Are you sure you want to delete this painting?')) {
       try {
         const response = await fetch(`/api/paintings/${painting.id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
         });
         if (!response.ok) throw new Error('Failed to delete');
         router.push('/paintings');
@@ -43,7 +43,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
   const handleDownload = (url: string, filename: string) => {
     axios
       .get(url, {
-        responseType: 'blob'
+        responseType: 'blob',
       })
       .then((res) => {
         fileDownload(res.data, filename);
@@ -171,12 +171,12 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
           </svg>
           {isOpen ? 'Hide' : 'Comment'}
         </button>
-        {/* 
+
         {isOpen && (
           <div className="mt-4 bg-white rounded-lg shadow p-4">
             <CommentsList user={session?.user} painting_id={painting.id} />
           </div>
-        )} */}
+        )}
       </div>
     </div>
   );
