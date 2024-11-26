@@ -60,3 +60,7 @@ body {
 .swiper-lazy-preloader {
   @apply border-blue-500;
 }
+
+.prose a {
+  @apply text-teal-600 hover:text-teal-700 transition-colors no-underline;
+}

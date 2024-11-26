@@ -10,10 +10,12 @@ import PostCommentsList from '@/components/PostCommentList';
 import VideoPlayer from '@/components/VideoPlayer';
 import { Post, User } from '@/lib/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import FormattedContent from '@/components/FormattedContent';
+import DateFormat from '@/components/DateFormat';
 
 type Props = {
   params: Promise<{
-    id: string;
+    id: number;
   }>;
 };
 
@@ -66,9 +68,9 @@ export default function PostDetail({ params }: Props) {
   const handleDeletePost = async (e: React.MouseEvent) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       await fetch(`/api/posts/${id}`, {
-        method: 'DELETE',
+        method: 'DELETE'
       });
-      router.push('/');
+      router.push('/news');
     }
   };
 
@@ -108,6 +110,7 @@ export default function PostDetail({ params }: Props) {
             )}
             {videoUrl !== 'undefined' &&
               videoUrl !== null &&
+              videoUrl !== '' &&
               videoUrl !== 'null' &&
               videoUrl !== undefined && (
                 <div>
@@ -120,10 +123,10 @@ export default function PostDetail({ params }: Props) {
           <div className="p-6 md:w-1/2">
             <h2 className="mb-2 text-2xl font-bold">{post.title}</h2>
             <div className="mb-4 text-sm text-gray-600">
-              <span>{post.date_added}</span>
+              <DateFormat date={post.date_added} />
             </div>
             <div className="mb-6">
-              <p className="text-gray-700">{post.content}</p>
+              <FormattedContent content={post.content || ''} />
             </div>
             <div className="flex gap-2 pt-4">
               <Link href="/news" className="rounded-full bg-teal-50 p-2 text-teal-600 hover:bg-teal-100">
@@ -132,7 +135,7 @@ export default function PostDetail({ params }: Props) {
               {session?.user && isAdmin && (
                 <>
                   <Link
-                    href={`/posts/${id}/edit`}
+                    href={`/news/${id}/edit`}
                     className="rounded-full bg-teal-600 p-2 text-white hover:bg-teal-700"
                   >
                     <Edit className="h-5 w-5" />
@@ -155,10 +158,8 @@ export default function PostDetail({ params }: Props) {
             session?.user
               ? {
                   id: session.user.id,
-                  username: session.user.name,
-                  email: session.user.email,
-                  image: session.user.image,
-                  password_hash: '',
+                  username: session.user.name || '',
+                  email: session.user.email
                 }
               : null
           }

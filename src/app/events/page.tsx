@@ -14,14 +14,14 @@ const metadata: Metadata = {
     description: 'Imagination and Emotion',
     type: 'website',
     images: ['https://yasminmostoller.com/images/slider2.jpg'],
-    url: 'https://yasminmostoller.com/events',
+    url: 'https://yasminmostoller.com/events'
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Yasmin Mostoller | Exhibitions',
     description: 'Imagination and Emotion',
-    images: ['https://yasminmostoller.com/images/slider2.jpg'],
-  },
+    images: ['https://yasminmostoller.com/images/slider2.jpg']
+  }
 };
 
 interface EventType {
@@ -38,7 +38,7 @@ interface EventType {
 export default function EventsPage() {
   const [events, setEvents] = useState<EventType[]>([]);
   const { data: session } = useSession();
-  const isAdmin = true;
+  const isAdmin = session?.user?.is_admin;
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

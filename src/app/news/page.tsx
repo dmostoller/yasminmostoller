@@ -6,19 +6,14 @@ import { Plus } from 'lucide-react';
 import { Post as PostType } from '@/lib/types';
 import Post from '@/components/Post';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useSession } from 'next-auth/react';
 
-interface PostsListProps {
-  user: {
-    id: number;
-    username: string;
-  } | null;
-  isAdmin: boolean;
-}
-
-const NewsPage = ({ user, isAdmin }: PostsListProps) => {
+const NewsPage = () => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.is_admin;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -81,15 +76,15 @@ const NewsPage = ({ user, isAdmin }: PostsListProps) => {
 
   return (
     <div className="container mx-auto px-4 mt-12">
-      {user && isAdmin && (
+      {session?.user && isAdmin && (
         <div className="max-w-7xl mx-auto">
           <Link
-            href="/posts/new"
+            href="/news/new"
             className="w-full flex items-center justify-center px-4 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition-colors group"
             tabIndex={0}
           >
             <span className="block group-hover:hidden">
-              <Plus className="h-5 w-5" />
+              <Plus className="h-6 w-6" />
             </span>
             <span className="hidden group-hover:block">Create New Post</span>
           </Link>

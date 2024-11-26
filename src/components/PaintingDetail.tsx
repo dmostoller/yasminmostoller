@@ -9,18 +9,20 @@ import axios from 'axios';
 import fileDownload from 'js-file-download';
 import CommentsList from '@/components/CommentsList';
 // import PaintingModal from '@/components/PaintingModal';
-import type { Painting } from '@/lib/types';
+import type { Painting, User } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 
 interface PaintingDetailProps {
   painting: Painting;
 }
+interface Session {
+  user: User | null;
+}
 
 export default function PaintingDetail({ painting: initialPainting }: PaintingDetailProps) {
   const router = useRouter();
-  const { data: session } = useSession();
-  //   const isAdmin = session?.user?.role === 'admin';
-  const isAdmin = true;
+  const { data: session }: { data: Session | null } = useSession();
+  const isAdmin = session?.user?.is_admin;
   const [painting] = useState<Painting>(initialPainting);
   const [modalOpen, setModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +31,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
     if (window.confirm('Are you sure you want to delete this painting?')) {
       try {
         const response = await fetch(`/api/paintings/${painting.id}`, {
-          method: 'DELETE',
+          method: 'DELETE'
         });
         if (!response.ok) throw new Error('Failed to delete');
         router.push('/paintings');
@@ -43,7 +45,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
   const handleDownload = (url: string, filename: string) => {
     axios
       .get(url, {
-        responseType: 'blob',
+        responseType: 'blob'
       })
       .then((res) => {
         fileDownload(res.data, filename);

@@ -6,7 +6,7 @@ import { Comment, User } from '@/lib/types';
 
 interface CommentFormProps {
   onAddComment: (comment: Comment) => void;
-  paintingId: string;
+  paintingId: number;
   onChangeIsComFormVis: () => void;
   user: User;
 }
@@ -15,29 +15,29 @@ const CommentForm: React.FC<CommentFormProps> = ({
   onAddComment,
   paintingId,
   onChangeIsComFormVis,
-  user,
+  user
 }) => {
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
-    comment: yup.string().required('Please enter a comment'),
+    comment: yup.string().required('Please enter a comment')
   });
 
   const formik = useFormik({
     initialValues: {
       comment: '',
       date_added: `${new Date().toLocaleDateString('en-US')} ${new Date().toLocaleTimeString('en-US')}`,
-      painting_id: parseInt(paintingId),
-      user_id: user.id,
+      painting_id: paintingId,
+      user_id: user.id
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
       fetch('/comment', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(values)
       }).then((res) => {
         if (res.ok) {
           res.json().then((newComment: Comment) => {
@@ -48,7 +48,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           res.json().then((error) => setError(error.message));
         }
       });
-    },
+    }
   });
 
   return (

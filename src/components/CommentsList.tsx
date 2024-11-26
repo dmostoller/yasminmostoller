@@ -7,7 +7,7 @@ import CommentForm from './CommentForm';
 import { Comment as CommentType, User } from '@/lib/types';
 
 interface CommentsListProps {
-  user: User | null;
+  user: User | null | undefined;
   painting_id: number;
 }
 
@@ -39,7 +39,7 @@ const CommentsList: React.FC<CommentsListProps> = ({ user, painting_id }) => {
         comment={comment.comment || ''}
         date_added={comment.date_added || ''}
         comment_user_id={comment.user_id || 0}
-        user={user}
+        user={user ?? null}
         onDeleteComment={deleteComment}
       />
     ));

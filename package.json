@@ -12,12 +12,17 @@
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@prisma/client": "^5.22.0",
+    "@tinymce/tinymce-react": "^5.1.1",
+    "@types/dompurify": "^3.0.5",
     "axios": "^1.7.7",
     "cloudinary-core": "^2.13.1",
     "cloudinary-video-player": "^2.1.1",
+    "dompurify": "^3.2.0",
     "formik": "^2.4.6",
     "framer-motion": "^11.11.17",
+    "html-react-parser": "^5.1.18",
     "js-file-download": "^0.4.12",
+    "jsdom": "^25.0.1",
     "lucide-react": "^0.460.0",
     "next": "15.0.3",
     "next-auth": "^4.24.10",
@@ -29,6 +34,8 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/jsdom": "^21.1.7",
     "@types/node": "^20.17.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",

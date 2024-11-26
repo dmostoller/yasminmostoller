@@ -87,7 +87,6 @@ export interface Post {
 export interface User {
   id: number;
   username: string;
-  password_hash: string;
   email?: string;
   is_admin?: boolean;
   comments?: Comment[];
