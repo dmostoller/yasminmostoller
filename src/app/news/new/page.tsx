@@ -1,4 +1,3 @@
-// FILE: app/posts/new/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -72,7 +71,7 @@ const NewPostPage = () => {
                 Upload image or video then enter post info...
                 <Link href="/news" className="text-teal-600 hover:text-teal-700 flex items-center">
                   <ArrowLeft className="w-4 h-4 mr-1" />
-                  Back to news page
+                  Back to News page
                 </Link>
               </span>
             </label>
@@ -152,7 +151,7 @@ const NewPostPage = () => {
                 convert_urls: true,
                 link_default_target: '_blank',
                 link_assume_external_targets: true,
-                placeholder: 'Type your post content here...',
+                placeholder: 'Type your event description here...',
                 toolbar:
                   'undo redo | formatselect | ' +
                   'bold italic forecolor | alignleft aligncenter ' +

@@ -5,18 +5,12 @@ import Link from 'next/link';
 // import { useAdmin } from '../context/admin'
 import { useSession } from 'next-auth/react';
 import { Pencil, Trash2 } from 'lucide-react';
+import type { Event } from '@/lib/types';
+import FormattedContent from '@/components/FormattedContent';
 
-interface EventProps {
-  id: string;
-  name: string;
-  venue: string;
-  location: string;
-  details: string;
-  image_url: string;
-  event_date: string;
-  event_link: string;
+interface EventProps extends Event {
   isAdmin: boolean;
-  onDeleteEvent: (id: string) => void;
+  onDeleteEvent: (id: number) => void; // Changed to number since Event.id is number
 }
 
 export default function Event({
@@ -29,7 +23,7 @@ export default function Event({
   event_date,
   isAdmin,
   event_link,
-  onDeleteEvent,
+  onDeleteEvent
 }: EventProps) {
   const { data: session } = useSession();
 
@@ -38,7 +32,7 @@ export default function Event({
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
         await fetch(`/api/events/${id}`, {
-          method: 'DELETE',
+          method: 'DELETE'
         });
         onDeleteEvent(id);
       } catch (error) {
@@ -56,7 +50,9 @@ export default function Event({
 
           <p className="font-bold text-gray-700 mb-2">{venue}</p>
           <p className="font-bold text-gray-700 mb-4">{location}</p>
-          <p className="text-gray-600 mb-6">{details}</p>
+          <div className="mt-4">
+            <FormattedContent content={details || ''} />
+          </div>
 
           <div className="flex gap-4 mt-4">
             {session?.user && isAdmin ? (

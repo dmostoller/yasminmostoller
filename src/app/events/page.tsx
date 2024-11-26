@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Event from '@/components/Event';
+import { Plus } from 'lucide-react';
 import { Metadata } from 'next';
 import { useSession } from 'next-auth/react';
+import { Event as EventType } from '@/lib/types';
 
 const metadata: Metadata = {
   title: 'Yasmin Mostoller | Exhibitions',
@@ -24,21 +26,10 @@ const metadata: Metadata = {
   }
 };
 
-interface EventType {
-  id: string;
-  name: string;
-  location: string;
-  venue: string;
-  details: string;
-  image_url: string;
-  event_date: string;
-  event_link: string;
-}
-
 export default function EventsPage() {
   const [events, setEvents] = useState<EventType[]>([]);
   const { data: session } = useSession();
-  const isAdmin = session?.user?.is_admin;
+  const isAdmin = session?.user?.is_admin ?? false;
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,11 +56,11 @@ export default function EventsPage() {
     fetchEvents();
   }, []);
 
-  const deleteEvent = (deleted_event_id: string) => {
+  const deleteEvent = (deleted_event_id: number) => {
     setEvents((events) => events.filter((event) => event.id !== deleted_event_id));
   };
 
-  const sortedEvents = events.sort((a, b) => (a.event_date > b.event_date ? -1 : 1));
+  const sortedEvents = events.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1));
 
   if (isLoading) {
     return (
@@ -104,13 +95,17 @@ export default function EventsPage() {
 
   return (
     <div className="container mx-auto min-h-screen">
-      <div className="mt-12 mb-5 text-left container mx-auto">
+      <div className="mt-12 mb-5 text-left container mx-auto px-4">
         {session?.user && isAdmin && (
           <Link
             href="/events/new"
-            className="w-full flex items-center justify-center px-4 py-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition-colors"
+            className="w-full flex items-center justify-center px-4 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition-colors group"
+            tabIndex={0}
           >
-            <span>Create New Event</span>
+            <span className="block group-hover:hidden">
+              <Plus className="h-6 w-6" />
+            </span>
+            <span className="hidden group-hover:block">Create New Event</span>
           </Link>
         )}
 

@@ -53,6 +53,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
       video_url: videoUrl || ''
     },
     validationSchema: formSchema,
+    validateOnMount: false,
     onSubmit: async (values) => {
       const submitValues = {
         ...values,
@@ -137,7 +138,9 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
               placeholder="Post title..."
               className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
             />
-            {formik.errors.title && <p className="text-center text-sm text-red-500">{formik.errors.title}</p>}
+            {formik.touched.title && formik.errors.title && (
+              <p className="text-center text-sm text-red-500">{formik.errors.title}</p>
+            )}
           </div>
 
           <div className="space-y-2">
