@@ -44,11 +44,6 @@ export default function RootLayout({
           <main className="bg-white flex-grow pt-[72px]">{children}</main>
           <Footer />
         </ClientSessionProvider>
-        {/* <Script
-          src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-video-player/2.0.2/cld-video-player.min.js"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        /> */}
         <Script
           src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-video-player/2.0.2/cld-video-player.min.js"
           crossOrigin="anonymous"

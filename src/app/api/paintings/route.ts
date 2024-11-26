@@ -47,3 +47,34 @@ export async function GET() {
     await prisma.$disconnect();
   }
 }
+// Create new painting
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+
+    // Validate required fields
+    if (!body.title || !body.image) {
+      return NextResponse.json({ error: 'Title and image are required' }, { status: 400 });
+    }
+
+    const newPainting = await prisma.paintings.create({
+      data: {
+        title: body.title,
+        materials: body.materials || null,
+        width: body.width ? parseInt(body.width) : null,
+        height: body.height ? parseInt(body.height) : null,
+        sale_price: body.sale_price ? parseInt(body.sale_price) : null,
+        image: body.image,
+        sold: body.sold === 'true',
+        folder_id: body.folder_id ? parseInt(body.folder_id) : null
+      }
+    });
+
+    return NextResponse.json(newPainting, { status: 201 });
+  } catch (error) {
+    console.error('Database error:', error);
+    return NextResponse.json({ error: 'Failed to create painting' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
+}

@@ -14,7 +14,7 @@ const ITEMS_PER_PAGE = 6;
 
 export default function PaintingsPage() {
   const { data: session } = useSession();
-  const isAdmin = false;
+  const isAdmin = session?.user?.is_admin ?? false;
   const [paintings, setPaintings] = useState<Painting[]>([]);
   const [folders, setFolders] = useState<FolderType[]>([]);
   const [selectedFolder, setSelectedFolder] = useState('none');
@@ -88,13 +88,17 @@ export default function PaintingsPage() {
   });
 
   if (sortBy === 'Small') {
-    searchResults.sort((a, b) => (a.width * a.height < b.width * b.height ? -1 : 1));
+    searchResults.sort((a, b) =>
+      (a.width ?? 0) * (a.height ?? 0) < (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
+    );
   } else if (sortBy === 'Large') {
-    searchResults.sort((a, b) => (a.width * a.height > b.width * b.height ? -1 : 1));
+    searchResults.sort((a, b) =>
+      (a.width ?? 0) * (a.height ?? 0) > (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
+    );
   } else if (sortBy === 'Low') {
-    searchResults.sort((a, b) => (a.sale_price < b.sale_price ? -1 : 1));
+    searchResults.sort((a, b) => ((a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1));
   } else if (sortBy === 'High') {
-    searchResults.sort((a, b) => (a.sale_price > b.sale_price ? -1 : 1));
+    searchResults.sort((a, b) => ((a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1));
   }
 
   const folderResults = searchResults.filter((painting) => {
@@ -151,7 +155,7 @@ export default function PaintingsPage() {
               <Plus className="mr-2 h-5 w-5" />
               Add Painting
             </Link>
-
+            {/* 
             {showFolderInput ? (
               <></>
             ) : (
@@ -163,12 +167,12 @@ export default function PaintingsPage() {
                 <Folder className="mr-2 h-5 w-5" />
                 Create Folder
               </button>
-            )}
+            )} */}
           </div>
         )}
       </div>
       <Suspense fallback={<PaintingSkeleton />}>
-        <div className="container mx-auto pt-12">
+        <div className="container mx-auto pt-6">
           <PaintingsList paintings={paginatedResults} />
 
           {/* Pagination Controls */}

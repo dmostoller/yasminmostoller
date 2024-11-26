@@ -32,7 +32,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     }
 
     const formattedPainting: Painting = {
-      id: painting.id.toString(),
+      id: painting.id,
       title: painting.title,
       materials: painting.materials || '',
       width: painting.width || 0,
@@ -52,6 +52,63 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   } catch (error) {
     console.error('Database error:', error);
     return NextResponse.json({ error: 'Failed to fetch painting' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// Update painting
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const resolvedParams = await Promise.resolve(params);
+    const id = parseInt(resolvedParams.id);
+    const body = await request.json();
+
+    if (isNaN(id)) {
+      return NextResponse.json({ error: 'Invalid painting ID' }, { status: 400 });
+    }
+
+    const updatedPainting = await prisma.paintings.update({
+      where: { id },
+      data: {
+        title: body.title,
+        materials: body.materials,
+        width: parseInt(body.width),
+        height: parseInt(body.height),
+        sale_price: parseInt(body.sale_price),
+        image: body.image,
+        sold: body.sold === 'true',
+        folder_id: parseInt(body.folder_id)
+      }
+    });
+
+    return NextResponse.json(updatedPainting, { status: 200 });
+  } catch (error) {
+    console.error('Database error:', error);
+    return NextResponse.json({ error: 'Failed to update painting' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// Delete painting
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const resolvedParams = await Promise.resolve(params);
+    const id = parseInt(resolvedParams.id);
+
+    if (isNaN(id)) {
+      return NextResponse.json({ error: 'Invalid painting ID' }, { status: 400 });
+    }
+
+    await prisma.paintings.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ message: 'Painting deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Database error:', error);
+    return NextResponse.json({ error: 'Failed to delete painting' }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

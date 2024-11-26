@@ -35,14 +35,14 @@ export interface MailingListEntry {
 export interface Painting {
   id: number;
   title: string;
-  materials?: string;
-  width?: number;
-  height?: number;
-  price?: string;
-  sale_price?: number;
-  image?: string;
-  sold?: boolean;
-  folder_id?: number;
+  materials?: string | null;
+  width?: number | null;
+  height?: number | null;
+  price?: string | null;
+  sale_price?: number | null;
+  image?: string | null;
+  sold?: boolean | null;
+  folder_id?: number | null;
   comments?: Comment[];
   folders?: Folder;
   poll_paintings?: PollPainting[];
