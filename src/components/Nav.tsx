@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Menu as MenuIcon, X as CloseIcon, LogIn, LogOut, User } from 'lucide-react';
+import { X as CloseIcon, LogIn, LogOut, User } from 'lucide-react';
 import { useSession, signIn, signOut } from 'next-auth/react';
+import { MenuIcon } from './icons/Menu';
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,8 +15,12 @@ const Nav = () => {
   const handleSignOut = async () => {
     await signOut({
       callbackUrl: '/',
-      redirect: true
+      redirect: true,
     });
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
@@ -77,12 +82,12 @@ const Nav = () => {
           </Link>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden z-[999]">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={toggleMobileMenu}
               className="text-gray-700 hover:text-teal-500 focus:outline-none"
             >
-              {isMenuOpen ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+              <MenuIcon isOpen={isMenuOpen} />
             </button>
           </div>
 
@@ -102,46 +107,46 @@ const Nav = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="fixed inset-0 z-50 md:hidden bg-black bg-opacity-50">
+            <div className="h-full flex flex-col items-center justify-center space-y-6 bg-white">
               <Link
                 href="/gallery"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Gallery
               </Link>
               <Link
                 href="/paintings"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Paintings
               </Link>
               <Link
                 href="/events"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Exhibitions
               </Link>
               <Link
                 href="/news"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 News
               </Link>
               <Link
                 href="/about"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Bio
               </Link>
               <Link
                 href="/contact"
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-500"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact
