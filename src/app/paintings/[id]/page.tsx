@@ -34,10 +34,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: painting.title,
-    description: `View ${painting.title} painting details`
+    description: `View ${painting.title} painting details`,
+    openGraph: {
+      title: painting.title,
+      description: `View ${painting.title} painting details`,
+      images: [
+        {
+          url: painting.image || '',
+          width: 1200,
+          height: 630,
+          alt: painting.title
+        }
+      ]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: painting.title,
+      description: `View ${painting.title} painting details`,
+      images: [painting.image || '']
+    }
   };
 }
-
 export default async function Page({ params }: PageProps) {
   const resolvedParams = await Promise.resolve(params);
 
