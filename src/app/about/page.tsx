@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Facebook, Instagram } from 'lucide-react';
+import Image from 'next/image';
 
 export const metadata = {
   title: 'Yasmin Mostoller | About Me',
@@ -26,10 +27,14 @@ export default function AboutPage() {
         {/* Main container - column on mobile, row on desktop */}
         <div className="flex flex-col md:flex-row">
           {/* Image container */}
-          <div className="w-full md:w-1/2">
-            <img
-              className="w-full h-full object-cover"
+          <div className="relative w-full md:w-1/2 aspect-[4/3]">
+            {' '}
+            {/* 4:3 aspect ratio */}
+            <Image
+              className="object-cover rounded-lg"
               src="/images/slider2.jpg"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               alt="Yasmin Mostoller at the Jed William's Gallery"
             />
           </div>

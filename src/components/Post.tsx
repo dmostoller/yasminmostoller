@@ -5,6 +5,7 @@ import { Post as PostType } from '@/lib/types';
 import VideoPlayer from '@/components/VideoPlayer';
 import FormattedContent from '@/components/FormattedContent';
 import DateFormat from '@/components/DateFormat';
+import Image from 'next/image';
 
 interface PostProps extends Partial<PostType> {
   isAdmin?: boolean;
@@ -15,7 +16,13 @@ const Post: FC<PostProps> = ({ id, title, content, image_url, video_url, date_ad
     <div className="w-full max-w-3xl bg-white rounded-lg shadow-md overflow-hidden">
       {image_url !== 'undefined' && image_url !== null && image_url !== 'null' && (
         <div className="aspect-w-16 aspect-h-9">
-          <img className="object-cover w-full h-full" src={image_url} alt={title || 'Post image'} />
+          <Image
+            className="object-cover w-full h-full"
+            src={image_url || ''}
+            alt={title || 'Post image'}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />{' '}
         </div>
       )}
 
