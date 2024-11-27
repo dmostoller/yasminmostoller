@@ -4,19 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useState } from 'react';
-import { Menu as MenuIcon, X as CloseIcon, LogIn, UserPlus, LogOut, User } from 'lucide-react';
+import { Menu as MenuIcon, X as CloseIcon, LogIn, LogOut, User } from 'lucide-react';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
   const { data: session, status } = useSession();
-  const user = null;
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push('/');
+    await signOut({
+      callbackUrl: '/',
+      redirect: true
+    });
   };
 
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
@@ -64,12 +63,6 @@ const Nav = () => {
         >
           <LogIn className="w-6 h-6" />
         </button>
-        {/* <Link
-          href="/signin"
-          className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-50"
-        >
-          <UserPlus className="w-6 h-6" />
-        </Link> */}
       </>
     );
   };
