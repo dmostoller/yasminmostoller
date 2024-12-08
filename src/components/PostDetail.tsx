@@ -11,6 +11,9 @@ import { Post } from '@/lib/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import FormattedContent from '@/components/FormattedContent';
 import DateFormat from '@/components/DateFormat';
+import { CldImage } from 'next-cloudinary';
+import { CldVideoPlayer } from 'next-cloudinary';
+import 'next-cloudinary/dist/cld-video-player.css';
 
 interface PostDetailProps {
   post: Post;
@@ -34,7 +37,7 @@ export default function PostDetail({ post }: PostDetailProps) {
   const handleDeletePost = async (e: React.MouseEvent) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       await fetch(`/api/posts/${post.id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
       router.push('/news');
     }
@@ -42,17 +45,20 @@ export default function PostDetail({ post }: PostDetailProps) {
 
   return (
     <div className="container mx-auto min-h-screen px-4 mt-12">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-lg bg-white shadow-md">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-lg bg-[var(--background-secondary)] border border-[var(--card-border)] shadow-md">
         <div className="md:flex">
           {/* Left column - Media */}
           <div className="md:w-3/4">
             {post.image_url !== 'undefined' && post.image_url !== null && post.image_url !== 'null' && (
               <div>
-                <img
-                  src={post.image_url}
+                <CldImage
+                  width="960"
+                  height="600"
                   onClick={handleOpen}
-                  alt={post.title}
-                  className="w-full cursor-pointer object-cover"
+                  src={post.image_url || ''}
+                  alt={post.title || 'Post image'}
+                  sizes="100vw"
+                  className="cursor-pointer"
                 />
               </div>
             )}
@@ -62,22 +68,22 @@ export default function PostDetail({ post }: PostDetailProps) {
               videoUrl !== 'null' &&
               videoUrl !== undefined && (
                 <div>
-                  <VideoPlayer videoUrl={videoUrl} />
+                  <CldVideoPlayer width="1080" height="1920" src={videoUrl} />
                 </div>
               )}
           </div>
 
           {/* Right column - Content */}
           <div className="p-6 md:w-1/2">
-            <h2 className="mb-2 text-2xl font-bold">{post.title}</h2>
-            <div className="mb-4 text-sm text-gray-600">
+            <h2 className="mb-2 text-2xl font-bold text-[var(--text-primary)]">{post.title}</h2>
+            <div className="mb-4 text-sm text-[var(--text-secondary)]">
               <DateFormat date={post.date_added} />
             </div>
-            <div className="mb-6">
+            <div className="mb-6 text-[var(--text-primary)]">
               <FormattedContent content={post.content || ''} />
             </div>
             <div className="flex gap-2 pt-4">
-              <Link href="/news" className="rounded-full bg-teal-50 p-2 text-teal-600 hover:bg-teal-100">
+              <Link href="/news" className="rounded-full bg-teal-600 p-2 text-white hover:bg-teal-700">
                 <Undo className="h-5 w-5" />
               </Link>
               {session?.user && isAdmin && (
@@ -100,14 +106,14 @@ export default function PostDetail({ post }: PostDetailProps) {
           </div>
         </div>
       </div>
-      <div className="mt-8 rounded-lg bg-white p-6 shadow-md">
+      <div className="mt-8 rounded-lg bg-[var(--background-secondary)] border border-[var(--card-border)] p-6 shadow-md">
         <PostCommentsList
           user={
             session?.user
               ? {
                   id: session.user.id,
                   username: session.user.name || '',
-                  email: session.user.email
+                  email: session.user.email,
                 }
               : null
           }

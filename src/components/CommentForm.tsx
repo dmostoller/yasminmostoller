@@ -15,12 +15,12 @@ const CommentForm: React.FC<CommentFormProps> = ({
   onAddComment,
   paintingId,
   onChangeIsComFormVis,
-  user
+  user,
 }) => {
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
-    comment: yup.string().required('Please enter a comment')
+    comment: yup.string().required('Please enter a comment'),
   });
 
   const formik = useFormik({
@@ -28,16 +28,16 @@ const CommentForm: React.FC<CommentFormProps> = ({
       comment: '',
       date_added: `${new Date().toLocaleDateString('en-US')} ${new Date().toLocaleTimeString('en-US')}`,
       painting_id: paintingId,
-      user_id: user.id
+      user_id: user.id,
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
       fetch('/comment', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values)
+        body: JSON.stringify(values),
       }).then((res) => {
         if (res.ok) {
           res.json().then((newComment: Comment) => {
@@ -48,7 +48,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           res.json().then((error) => setError(error.message));
         }
       });
-    }
+    },
   });
 
   return (
@@ -56,11 +56,11 @@ const CommentForm: React.FC<CommentFormProps> = ({
       <form className="w-full" onSubmit={formik.handleSubmit}>
         <div className="mb-4">
           <div className="flex items-center justify-between">
-            <label className="block text-gray-700 text-sm font-medium mb-2">Add Comment</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-medium mb-2">Add Comment</label>
             <button
               type="button"
               onClick={onChangeIsComFormVis}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               <X size={20} />
             </button>
@@ -72,7 +72,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
             value={formik.values.comment}
             onChange={formik.handleChange}
             placeholder="Your comment here"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-[var(--background)] text-[var(--text-primary)]"
           />
           {formik.errors.comment && (
             <p className="text-red-500 text-center text-sm mt-1">{formik.errors.comment}</p>

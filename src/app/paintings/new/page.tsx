@@ -58,7 +58,7 @@ export default function NewPaintingPage() {
     sale_price: yup.string().required('Please enter an price'),
     image: yup.string().required('Please enter an image link'),
     sold: yup.string().required('Please select a value'),
-    folder_id: yup.number().required('Please select a value')
+    folder_id: yup.number().required('Please select a value'),
   });
 
   const formik = useFormik({
@@ -71,7 +71,7 @@ export default function NewPaintingPage() {
       sale_price: '',
       image: imageUrl,
       sold: '',
-      folder_id: ''
+      folder_id: '',
     },
     validationSchema: formSchema,
     onSubmit: async (values) => {
@@ -79,9 +79,9 @@ export default function NewPaintingPage() {
         const res = await fetch('/api/paintings', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(values)
+          body: JSON.stringify(values),
         });
 
         if (res.ok) {
@@ -94,7 +94,7 @@ export default function NewPaintingPage() {
       } catch (err) {
         setError('An error occurred while submitting');
       }
-    }
+    },
   });
 
   if (isLoading) return <div className="text-center">Loading folders...</div>;
@@ -105,12 +105,12 @@ export default function NewPaintingPage() {
       {error && <h2 className="text-center text-red-500">{error}</h2>}
       <div className="container mx-auto min-h-screen max-w-2xl px-4 mt-12 mb-6">
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
-          <div className="border-b border-gray-200 py-4">
-            <h4 className="text-center text-2xl font-medium">Add New Painting</h4>
+          <div className="border-b border-border py-4">
+            <h4 className="text-center text-2xl font-medium text-foreground">Add New Painting</h4>
           </div>
 
           <div className="space-y-2">
-            <label className="flex items-center justify-between">
+            <label className="flex items-center justify-between text-foreground">
               <span>Upload image then enter painting info...</span>
               <Link href="/paintings" className="flex items-center text-blue-600 hover:text-blue-800">
                 <ArrowLeft className="mr-1 h-4 w-4" />
@@ -133,66 +133,66 @@ export default function NewPaintingPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block">Title</label>
+            <label className="block text-foreground">Title</label>
             <input
               type="text"
               name="title"
               value={formik.values.title}
               placeholder="Title..."
               onChange={formik.handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
             {formik.errors.title && <p className="text-center text-red-500">{formik.errors.title}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="block">Materials</label>
+            <label className="block text-foreground">Materials</label>
             <input
               type="text"
               name="materials"
               value={formik.values.materials}
               placeholder="Materials..."
               onChange={formik.handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
             {formik.errors.materials && <p className="text-center text-red-500">{formik.errors.materials}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="block">Width</label>
+            <label className="block text-foreground">Width</label>
             <input
               type="text"
               name="width"
               value={formik.values.width}
               placeholder="Width in inches..."
               onChange={formik.handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
             {formik.errors.width && <p className="text-center text-red-500">{formik.errors.width}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="block">Height</label>
+            <label className="block text-foreground">Height</label>
             <input
               type="text"
               name="height"
               value={formik.values.height}
               placeholder="Height in inches..."
               onChange={formik.handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
             {formik.errors.height && <p className="text-center text-red-500">{formik.errors.height}</p>}
           </div>
 
           <div className="space-y-2">
-            <label className="block">Sale Price</label>
+            <label className="block text-foreground">Sale Price</label>
             <input
               type="text"
               name="sale_price"
               value={formik.values.sale_price}
               placeholder="Price..."
               onChange={formik.handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
             {formik.errors.sale_price && (
               <p className="text-center text-red-500">{formik.errors.sale_price}</p>
@@ -204,7 +204,7 @@ export default function NewPaintingPage() {
               name="sold"
               onChange={formik.handleChange}
               value={formik.values.sold}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             >
               <option value="false">For Sale</option>
               <option value="true">Sold</option>
@@ -213,12 +213,12 @@ export default function NewPaintingPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block">Folder</label>
+            <label className="block text-foreground">Folder</label>
             <select
               name="folder_id"
               onChange={formik.handleChange}
               value={formik.values.folder_id}
-              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             >
               {folderList}
             </select>

@@ -29,7 +29,7 @@ const Nav = () => {
     return (
       <Link
         href={href}
-        className={`px-4 py-2 hover:text-teal-500 ${isActive ? 'text-teal-600' : 'text-gray-700'}`}
+        className={`px-4 py-2 hover:text-teal-500 ${isActive ? 'text-teal-600' : 'text-[var(--text-secondary)]'}`}
       >
         {children}
       </Link>
@@ -38,22 +38,22 @@ const Nav = () => {
 
   const renderAuthButtons = () => {
     if (status === 'loading') {
-      return <div className="animate-pulse w-20 h-8 bg-gray-200 rounded" />;
+      return <div className="animate-pulse w-20 h-8 bg-[var(--gray-100)] rounded" />;
     }
 
     if (status === 'authenticated' && session.user) {
       return (
         <>
-          <span className="text-gray-700 mr-4">Welcome, {session.user.name}</span>
+          <span className="text-[var(--text-secondary)] mr-4">Welcome, {session.user.name}</span>
           <button
             onClick={handleSignOut}
-            className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-50"
+            className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-900"
           >
             <LogOut className="w-6 h-6" />
           </button>
           <Link
             href="/user"
-            className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-50"
+            className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-900"
           >
             <User className="w-6 h-6" />
           </Link>
@@ -64,7 +64,7 @@ const Nav = () => {
       <>
         <button
           onClick={() => signIn('google')}
-          className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-50"
+          className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-900"
         >
           <LogIn className="w-6 h-6" />
         </button>
@@ -73,7 +73,7 @@ const Nav = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+    <nav className="fixed top-0 left-0 right-0 bg-[var(--background)] shadow-md z-50">
       <div className="max-w-7xl mx-auto p-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -85,7 +85,7 @@ const Nav = () => {
           <div className="md:hidden z-[999]">
             <button
               onClick={toggleMobileMenu}
-              className="text-gray-700 hover:text-teal-500 focus:outline-none"
+              className="text-[var(--text-secondary)] hover:text-teal-500 focus:outline-none"
             >
               <MenuIcon isOpen={isMenuOpen} />
             </button>
@@ -108,45 +108,45 @@ const Nav = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden bg-black bg-opacity-50">
-            <div className="h-full flex flex-col items-center justify-center space-y-6 bg-white">
+            <div className="h-full flex flex-col items-center justify-center space-y-6 bg-[var(--background)]">
               <Link
                 href="/gallery"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Gallery
               </Link>
               <Link
                 href="/paintings"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Paintings
               </Link>
               <Link
                 href="/events"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Exhibitions
               </Link>
               <Link
                 href="/news"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 News
               </Link>
               <Link
                 href="/about"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Bio
               </Link>
               <Link
                 href="/contact"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-gray-700 hover:text-teal-500 transition-colors"
+                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact

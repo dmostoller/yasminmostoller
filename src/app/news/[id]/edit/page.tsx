@@ -24,7 +24,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
     title: '',
     content: '',
     image_url: '',
-    video_url: ''
+    video_url: '',
   });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
 
   const formSchema = yup.object().shape({
     title: yup.string().required('Please enter a title').min(2, 'Name must be more than two characters long'),
-    content: yup.string().required('Please enter content for your post')
+    content: yup.string().required('Please enter content for your post'),
   });
 
   const formik = useFormik({
@@ -50,7 +50,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
       title: post.title || '',
       content: post.content || '',
       image_url: imageUrl || '',
-      video_url: videoUrl || ''
+      video_url: videoUrl || '',
     },
     validationSchema: formSchema,
     validateOnMount: false,
@@ -58,14 +58,14 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
       const submitValues = {
         ...values,
         image_url: values.image_url || null,
-        video_url: values.video_url || null
+        video_url: values.video_url || null,
       };
       const res = await fetch(`/api/posts/${id}`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submitValues)
+        body: JSON.stringify(submitValues),
       });
 
       if (res.ok) {
@@ -75,20 +75,20 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
         const error = await res.json();
         setError(error.message);
       }
-    }
+    },
   });
 
   return (
     <>
-      {error && <h2 className="text-center text-red-500">{error}</h2>}
+      {error && <h2 className="text-center text-error-foreground">{error}</h2>}
       <div className="container mx-auto min-h-screen max-w-2xl px-4 mt-16 mb-6">
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
-          <div className="flex items-center justify-center border-b border-gray-200 pb-4">
-            <h1 className="text-2xl font-bold">Edit Post</h1>
+          <div className="flex items-center justify-center border-b border-border pb-4">
+            <h1 className="text-2xl font-bold text-foreground">Edit Post</h1>
           </div>
           <div className="space-y-4">
             <label className="block">
-              <span className="flex items-center justify-between">
+              <span className="flex items-center justify-between text-foreground">
                 Upload image or video then enter post info...
                 <Link href={`/news/${id}`} className="flex items-center text-teal-600 hover:text-teal-700">
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -126,7 +126,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="title" className="block text-sm font-medium text-foreground">
               Post Title:
             </label>
             <input
@@ -136,15 +136,15 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
               value={formik.values.title}
               onChange={formik.handleChange}
               placeholder="Post title..."
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
+              className="w-full rounded-md border border-input bg-background px-4 py-2 text-foreground focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
             />
             {formik.touched.title && formik.errors.title && (
-              <p className="text-center text-sm text-red-500">{formik.errors.title}</p>
+              <p className="text-center text-sm text-error-foreground">{formik.errors.title}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="content" className="block text-sm font-medium text-foreground">
               Post Content:
             </label>
             <Editor
@@ -152,6 +152,8 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
               init={{
                 height: 400,
                 menubar: false,
+                skin: 'oxide-dark',
+                content_css: 'dark',
                 plugins: [
                   'advlist',
                   'autolink',
@@ -169,7 +171,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
                   'media',
                   'table',
                   'help',
-                  'wordcount'
+                  'wordcount',
                 ],
                 convert_urls: true,
                 link_default_target: '_blank',
@@ -178,7 +180,18 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
                   'undo redo | formatselect | ' +
                   'bold italic forecolor | alignleft aligncenter ' +
                   'alignright alignjustify | bullist numlist outdent indent | ' +
-                  'removeformat | help'
+                  'removeformat | help',
+                setup: (editor) => {
+                  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  editor.options.set('skin', isDarkMode ? 'oxide-dark' : 'oxide');
+                  editor.options.set('content_css', isDarkMode ? 'dark' : 'default');
+
+                  // Listen for system theme changes
+                  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
+                    editor.options.set('content_css', e.matches ? 'dark' : 'default');
+                  });
+                },
               }}
               value={formik.values.content}
               onEditorChange={(content) => {
@@ -186,7 +199,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
               }}
             />
             {formik.errors.content && (
-              <p className="text-center text-sm text-red-500">{formik.errors.content}</p>
+              <p className="text-center text-sm text-error-foreground">{formik.errors.content}</p>
             )}
           </div>
 

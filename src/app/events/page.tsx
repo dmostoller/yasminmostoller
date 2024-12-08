@@ -16,14 +16,14 @@ const metadata: Metadata = {
     description: 'Imagination and Emotion',
     type: 'website',
     images: ['https://yasminmostoller.com/images/slider2.jpg'],
-    url: 'https://yasminmostoller.com/events'
+    url: 'https://yasminmostoller.com/events',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Yasmin Mostoller | Exhibitions',
     description: 'Imagination and Emotion',
-    images: ['https://yasminmostoller.com/images/slider2.jpg']
-  }
+    images: ['https://yasminmostoller.com/images/slider2.jpg'],
+  },
 };
 
 export default function EventsPage() {
@@ -64,7 +64,7 @@ export default function EventsPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto min-h-screen flex items-center justify-center">
+      <div className="container mx-auto min-h-screen flex items-center justify-center bg-[var(--background-primary)]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
       </div>
     );
@@ -72,8 +72,8 @@ export default function EventsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border-l-4 border-red-500 p-4">
+      <div className="container mx-auto min-h-screen flex items-center justify-center bg-[var(--background-primary)]">
+        <div className="bg-[var(--background-secondary)] border-l-4 border-red-500 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
@@ -85,7 +85,7 @@ export default function EventsPage() {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-sm text-[var(--text-primary)]">{error}</p>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="container mx-auto min-h-screen">
+    <div className="container mx-auto min-h-screen bg-[var(--background-primary)]">
       <div className="mt-12 mb-5 text-left container mx-auto px-4">
         {session?.user && isAdmin && (
           <Link

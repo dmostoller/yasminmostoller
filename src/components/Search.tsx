@@ -50,13 +50,13 @@ export default function Search({
           value={searchQ}
           placeholder="Search..."
           onChange={(e) => onSearch(e.target.value)}
-          className="rounded-lg border border-gray-300 pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="rounded-lg border border-[var(--text-secondary)] pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
-        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
       </div>
 
       <select
-        className="rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="rounded-lg border border-[var(--text-secondary)] px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         name="folder"
         value={selectedFolder}
         onChange={setSelectedFolder}
@@ -66,7 +66,7 @@ export default function Search({
       </select>
 
       <select
-        className="rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="rounded-lg border border-[var(--text-secondary)] px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         name="sort"
         value={selected}
         onChange={sortBy}
@@ -81,9 +81,9 @@ export default function Search({
       <label className="flex items-center gap-2">
         <div className="relative inline-flex items-center">
           <input type="checkbox" className="peer sr-only" checked={forSale} onChange={toggleForSale} />
-          <div className="h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>
+          <div className="h-6 w-11 rounded-full bg-[var(--background-secondary)] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-[var(--text-secondary)] after:bg-[var(--background-secondary)] after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>
         </div>
-        <span className="text-sm font-medium text-gray-900">For Sale</span>
+        <span className="text-sm font-medium text-[var(--text-primary)]">For Sale</span>
       </label>
     </div>
   );

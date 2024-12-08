@@ -46,25 +46,25 @@ const PostComment: React.FC<PostCommentProps> = ({
   };
 
   return (
-    <div className="mb-4 rounded-lg bg-white p-4 shadow">
+    <div className="mb-4 rounded-lg bg-[var(--background-secondary)] p-4 shadow border border-[var(--text-secondary)]">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="font-medium text-gray-900">{username}</span>
-            <span className="text-sm text-gray-500">{date_added}</span>
+            <span className="font-medium text-[var(--text-primary)]">{username}</span>
+            <span className="text-sm text-[var(--text-secondary)]">{date_added}</span>
           </div>
           {user && user.id === comment_user_id && (
             <button
               onClick={handleDeleteComment}
               disabled={isDeleting}
-              className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500 disabled:opacity-50"
+              className="rounded-full p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--background-primary)] hover:text-red-500 disabled:opacity-50"
               aria-label="Delete comment"
             >
               <Trash2 className="h-4 w-4" />
             </button>
           )}
         </div>
-        <p className="text-gray-700">{comment}</p>
+        <p className="text-[var(--text-primary)]">{comment}</p>
       </div>
     </div>
   );

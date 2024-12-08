@@ -3,9 +3,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import axios from 'axios';
+import { Undo } from 'lucide-react';
 import fileDownload from 'js-file-download';
 import CommentsList from '@/components/CommentsList';
 // import PaintingModal from '@/components/PaintingModal';
@@ -31,7 +32,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
     if (window.confirm('Are you sure you want to delete this painting?')) {
       try {
         const response = await fetch(`/api/paintings/${painting.id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
         });
         if (!response.ok) throw new Error('Failed to delete');
         router.push('/paintings');
@@ -45,7 +46,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
   const handleDownload = (url: string, filename: string) => {
     axios
       .get(url, {
-        responseType: 'blob'
+        responseType: 'blob',
       })
       .then((res) => {
         fileDownload(res.data, filename);
@@ -57,15 +58,16 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
 
   return (
     <div className="container mx-auto">
-      <div className="mt-24 rounded-lg shadow-lg bg-white">
+      <div className="mt-24 rounded-lg shadow-lg bg-[var(--background-secondary)]">
         <div className="flex flex-col md:flex-row">
           <div className="relative w-full md:w-1/2">
-            <Image
-              src={painting.image || '/path/to/default/image.jpg'}
-              alt={painting.title}
-              width={500}
-              height={500}
-              className="rounded-lg cursor-pointer"
+            <CldImage
+              width="960"
+              height="600"
+              src={painting.image || ''}
+              alt={painting.title || 'Painting image'}
+              sizes="100vw"
+              className="cursor-pointer"
               onClick={() => setModalOpen(true)}
               priority
             />
@@ -108,12 +110,12 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
             </div>
 
             <div className="mt-4 space-y-2">
-              <h2 className="text-2xl font-bold">{painting.title}</h2>
-              <p className="text-gray-600">{painting.materials}</p>
-              <p className="text-gray-600">
+              <h2 className="text-2xl font-bold text-[var(--text-primary)]">{painting.title}</h2>
+              <p className="text-[var(--text-secondary)]">{painting.materials}</p>
+              <p className="text-[var(--text-secondary)]">
                 {painting.width}" x {painting.height}"
               </p>
-              <p className="text-gray-800">
+              <p className="text-[var(--text-primary)]">
                 {painting.sold ? (
                   <span className="font-semibold">SOLD</span>
                 ) : (
@@ -124,36 +126,44 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
               </p>
             </div>
 
-            {isAdmin && (
-              <div className="flex gap-2 mt-4">
-                <Link
-                  href={`/paintings/${painting.id}/edit`}
-                  className="p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                </Link>
-                <button
-                  onClick={handleDeletePainting}
-                  className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
-              </div>
-            )}
+            <div className="flex gap-2 mt-4">
+              <Link
+                href="/paintings"
+                className="p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition"
+              >
+                <Undo className="h-6 w-6" />
+              </Link>
+              {isAdmin && (
+                <>
+                  <Link
+                    href={`/paintings/${painting.id}/edit`}
+                    className="p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </Link>
+                  <button
+                    onClick={handleDeletePainting}
+                    className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -175,7 +185,7 @@ export default function PaintingDetail({ painting: initialPainting }: PaintingDe
         </button>
 
         {isOpen && (
-          <div className="mt-4 bg-white rounded-lg shadow p-4">
+          <div className="mt-4 bg-[var(--background-secondary)] rounded-lg shadow p-4">
             <CommentsList user={session?.user} painting_id={painting.id} />
           </div>
         )}

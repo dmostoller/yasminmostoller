@@ -15,15 +15,17 @@ const FormattedContent = ({ content }: FormattedContentProps) => {
             ...domNode.attribs,
             target: '_blank',
             rel: 'noopener noreferrer',
-            className: 'text-teal-600 hover:text-teal-700 transition-colors'
-          }
+            className: 'text-teal-600 hover:text-teal-700 transition-colors',
+          },
         };
       }
-    }
+    },
   };
 
   return (
-    <div className="prose prose-teal max-w-none prose-a:no-underline">{parse(content || '', options)}</div>
+    <div className="text-[var(--text-secondary)] prose prose-teal max-w-none prose-a:no-underline">
+      {parse(content || '', options)}
+    </div>
   );
 };
 

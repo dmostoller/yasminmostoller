@@ -42,7 +42,7 @@ const ContactForm = () => {
   return (
     <form ref={form} onSubmit={sendEmail} className="w-full max-w-lg mx-auto space-y-6">
       <div className="space-y-2">
-        <label htmlFor="from_name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="from_name" className="block text-sm font-medium text-[var(--text-primary)]">
           Name
         </label>
         <input
@@ -50,12 +50,12 @@ const ContactForm = () => {
           name="from_name"
           id="from_name"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="reply_to" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="reply_to" className="block text-sm font-medium text-[var(--text-primary)]">
           Email
         </label>
         <input
@@ -63,12 +63,12 @@ const ContactForm = () => {
           name="reply_to"
           id="reply_to"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="message" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="message" className="block text-sm font-medium text-[var(--text-primary)]">
           Message
         </label>
         <textarea
@@ -76,7 +76,7 @@ const ContactForm = () => {
           id="message"
           required
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+          className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
 

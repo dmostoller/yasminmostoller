@@ -73,7 +73,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
     sale_price: yup.string().required('Please enter an price'),
     image: yup.string().required('Please enter an image link'),
     sold: yup.string().required('Please select a value'),
-    folder_id: yup.number().required('Please select a value')
+    folder_id: yup.number().required('Please select a value'),
   });
 
   const formik = useFormik({
@@ -86,7 +86,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
       sale_price: painting.sale_price || '',
       image: imageUrl,
       sold: painting.sold ? 'true' : 'false',
-      folder_id: painting.folder_id || ''
+      folder_id: painting.folder_id || '',
     },
     validationSchema: formSchema,
     onSubmit: async (values) => {
@@ -94,9 +94,9 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
         const res = await fetch(`/api/paintings/${id}`, {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(values)
+          body: JSON.stringify(values),
         });
 
         if (res.ok) {
@@ -109,7 +109,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
       } catch (err) {
         setError('An error occurred while updating the painting');
       }
-    }
+    },
   });
 
   if (isLoading) return <div className="text-center">Loading folders...</div>;
@@ -120,12 +120,12 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
       {error && <h2 className="text-center text-red-500">{error}</h2>}
       <div className="container mx-auto min-h-screen max-w-2xl px-4 mt-16 mb-6">
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
-          <div className="flex items-center justify-center border-b border-gray-200 pb-4">
-            <h4 className="text-center text-2xl font-medium">Edit Painting</h4>
+          <div className="flex items-center justify-center border-b border-border pb-4">
+            <h4 className="text-center text-2xl font-medium text-foreground">Edit Painting</h4>
           </div>
 
           <div className="space-y-2">
-            <label className="flex items-center justify-between">
+            <label className="flex items-center justify-between text-foreground">
               <span>Upload image, then enter painting info...</span>
               <Link href={`/paintings/${id}`} className="flex items-center text-blue-600 hover:text-blue-800">
                 <ArrowLeft className="mr-1 h-4 w-4" />
@@ -145,90 +145,84 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
             {formik.errors.image && <p className="text-center text-red-500">{formik.errors.image}</p>}
           </div>
 
-          {/* Form Fields */}
           <div className="space-y-4">
-            {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Title</label>
+              <label className="block text-sm font-medium text-foreground">Title</label>
               <input
                 type="text"
                 name="title"
                 value={formik.values.title}
                 onChange={formik.handleChange}
                 placeholder="Title..."
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               />
               {formik.errors.title && <p className="text-center text-red-500">{formik.errors.title}</p>}
             </div>
 
-            {/* Materials */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Materials</label>
+              <label className="block text-sm font-medium text-foreground">Materials</label>
               <input
                 type="text"
                 name="materials"
                 value={formik.values.materials}
                 onChange={formik.handleChange}
                 placeholder="Materials..."
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               />
               {formik.errors.materials && (
                 <p className="text-center text-red-500">{formik.errors.materials}</p>
               )}
             </div>
 
-            {/* Dimensions */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Width</label>
+                <label className="block text-sm font-medium text-foreground">Width</label>
                 <input
                   type="text"
                   name="width"
                   value={formik.values.width}
                   onChange={formik.handleChange}
                   placeholder="Width in inches..."
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
                 />
                 {formik.errors.width && <p className="text-center text-red-500">{formik.errors.width}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Height</label>
+                <label className="block text-sm font-medium text-foreground">Height</label>
                 <input
                   type="text"
                   name="height"
                   value={formik.values.height}
                   onChange={formik.handleChange}
                   placeholder="Height in inches..."
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
                 />
                 {formik.errors.height && <p className="text-center text-red-500">{formik.errors.height}</p>}
               </div>
             </div>
 
-            {/* Price */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Price</label>
+              <label className="block text-sm font-medium text-foreground">Price</label>
               <input
                 type="text"
                 name="sale_price"
                 value={formik.values.sale_price}
                 onChange={formik.handleChange}
                 placeholder="Price..."
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               />
               {formik.errors.sale_price && (
                 <p className="text-center text-red-500">{formik.errors.sale_price}</p>
               )}
             </div>
 
-            {/* Status */}
             <div>
               <select
                 name="sold"
                 onChange={formik.handleChange}
                 value={formik.values.sold}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               >
                 <option value="false">For Sale</option>
                 <option value="true">Sold</option>
@@ -236,14 +230,13 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
               {formik.errors.sold && <p className="text-center text-red-500">{formik.errors.sold}</p>}
             </div>
 
-            {/* Folder */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Folder</label>
+              <label className="block text-sm font-medium text-foreground">Folder</label>
               <select
                 name="folder_id"
                 onChange={formik.handleChange}
                 value={formik.values.folder_id}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               >
                 {folderList}
               </select>
@@ -253,7 +246,6 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full rounded-full bg-teal-600 px-4 py-2 text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"

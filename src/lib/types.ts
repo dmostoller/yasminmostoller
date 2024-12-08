@@ -82,6 +82,7 @@ export interface Post {
   video_url?: string;
   date_added?: string;
   post_comments?: PostComment[];
+  isAdmin?: boolean;
 }
 
 export interface User {

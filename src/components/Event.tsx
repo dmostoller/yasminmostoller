@@ -1,8 +1,6 @@
 // components/Event.tsx
 import { useState } from 'react';
 import Link from 'next/link';
-// import { useUser } from '../context/user'
-// import { useAdmin } from '../context/admin'
 import { useSession } from 'next-auth/react';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Event } from '@/lib/types';
@@ -10,7 +8,7 @@ import FormattedContent from '@/components/FormattedContent';
 
 interface EventProps extends Event {
   isAdmin: boolean;
-  onDeleteEvent: (id: number) => void; // Changed to number since Event.id is number
+  onDeleteEvent: (id: number) => void;
 }
 
 export default function Event({
@@ -23,7 +21,7 @@ export default function Event({
   event_date,
   isAdmin,
   event_link,
-  onDeleteEvent
+  onDeleteEvent,
 }: EventProps) {
   const { data: session } = useSession();
 
@@ -32,7 +30,7 @@ export default function Event({
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
         await fetch(`/api/events/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
         });
         onDeleteEvent(id);
       } catch (error) {
@@ -43,14 +41,14 @@ export default function Event({
 
   return (
     <div className="w-full px-4 py-6">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-[var(--background-secondary)] border border-[var(--card-border)] rounded-lg shadow-md overflow-hidden">
         <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">{name}</h3>
-          <p className="text-sm text-gray-500 mb-4">{event_date}</p>
+          <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">{name}</h3>
+          <p className="text-sm text-[var(--text-secondary)] mb-4">{event_date}</p>
 
-          <p className="font-bold text-gray-700 mb-2">{venue}</p>
-          <p className="font-bold text-gray-700 mb-4">{location}</p>
-          <div className="mt-4">
+          <p className="font-bold text-[var(--text-primary)] mb-2">{venue}</p>
+          <p className="font-bold text-[var(--text-primary)] mb-4">{location}</p>
+          <div className="mt-4 text-[var(--text-secondary)]">
             <FormattedContent content={details || ''} />
           </div>
 
