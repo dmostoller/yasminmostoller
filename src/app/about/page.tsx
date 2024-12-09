@@ -2,6 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 import { Facebook, Instagram } from 'lucide-react';
 import Image from 'next/image';
+import { Mail } from 'lucide-react';
+import { PrimaryButton } from '@/components/buttons/PrimaryButton';
 
 export const metadata = {
   title: 'Yasmin Mostoller | About Me',
@@ -23,15 +25,15 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-[90vh] flex items-center justify-center p-4 bg-[var(--background-primary)]">
-      <div className="w-full max-w-6xl mx-auto mt-4 bg-[var(--background-secondary)] rounded-lg shadow-lg overflow-hidden">
+      <div className="w-full max-w-screen-2xl mx-auto mt-4 bg-[var(--background-secondary)] rounded-lg shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row">
-          <div className="relative w-full md:w-1/2 aspect-[4/3]">
+          <div className="relative w-full md:w-3/4 aspect-[4/3]">
             <Image
               className="object-cover rounded-lg"
               src="/images/slider2.jpg"
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              alt="Yasmin Mostoller at the Jed William's Gallery"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              alt="Yasmin Mostoller at the Jed Williams Gallery"
             />
           </div>
           <div className="p-6 w-full md:w-1/2">
@@ -65,12 +67,7 @@ export default function AboutPage() {
                 >
                   <Facebook />
                 </Link>
-                <Link
-                  href="/contact"
-                  className="px-6 py-3 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-                >
-                  Get In Touch
-                </Link>
+                <PrimaryButton href="/contact" text="Get In Touch" icon={Mail} className="rounded-full" />
                 <Link
                   href="https://www.instagram.com/yasminnunsy/"
                   target="_blank"

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { X as CloseIcon, LogIn, LogOut, User } from 'lucide-react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { MenuIcon } from './icons/Menu';
+import { SecondaryIconButton } from './buttons/SecondaryIconButton';
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,10 +27,37 @@ const Nav = () => {
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
     const pathname = usePathname();
     const isActive = pathname === href;
+
     return (
       <Link
         href={href}
-        className={`px-4 py-2 hover:text-teal-500 ${isActive ? 'text-teal-600' : 'text-[var(--text-secondary)]'}`}
+        className={`
+        relative px-4 py-2 mx-2 font-medium text-lg
+        transition-all duration-300 ease-in-out
+        rounded-md
+        
+        // Text styling with gradient on hover
+        ${
+          isActive
+            ? 'bg-gradient-to-r from-violet-600 via-blue-500 to-teal-400 bg-clip-text text-transparent'
+            : 'text-[var(--text-secondary)]'
+        }
+        hover:bg-gradient-to-r hover:from-violet-600 hover:via-blue-500 hover:to-teal-400
+        hover:bg-clip-text hover:text-transparent
+        
+        // Underline effect
+        after:content-['']
+        after:absolute after:bottom-0 after:left-0
+        after:w-full after:h-[2px]
+        after:bg-gradient-to-r after:from-violet-600 after:via-blue-500 after:to-teal-400
+        after:opacity-0 after:scale-x-0
+        after:transition-all after:duration-300
+        hover:after:opacity-100 hover:after:scale-x-100
+        ${isActive ? 'after:opacity-100 after:scale-x-100' : ''}
+        
+        // Subtle glow effect on hover
+        hover:shadow-[0_0_15px_-3px_rgba(139,92,246,0.1)]
+      `}
       >
         {children}
       </Link>
@@ -44,41 +72,26 @@ const Nav = () => {
     if (status === 'authenticated' && session.user) {
       return (
         <>
-          <span className="text-[var(--text-secondary)] mr-4">Welcome, {session.user.name}</span>
-          <button
-            onClick={handleSignOut}
-            className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-900"
-          >
-            <LogOut className="w-6 h-6" />
-          </button>
-          <Link
-            href="/user"
-            className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-900"
-          >
-            <User className="w-6 h-6" />
-          </Link>
+          {/* <span className="text-[var(--text-secondary)] mr-4">Hi, {session.user.name}</span> */}
+          <SecondaryIconButton onClick={handleSignOut} icon={LogOut} />
+          <SecondaryIconButton href="/user" icon={User} />
         </>
       );
     }
     return (
       <>
-        <button
-          onClick={() => signIn('google')}
-          className="rounded-full p-3 text-teal-600 border border-teal-600 hover:bg-teal-900"
-        >
-          <LogIn className="w-6 h-6" />
-        </button>
+        <SecondaryIconButton onClick={() => signIn('google')} icon={LogIn} />
       </>
     );
   };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-[var(--background)] shadow-md z-50">
-      <div className="max-w-7xl mx-auto p-4">
+      <div className="max-w-screen-2xl mx-auto p-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <Image src="/images/logo.jpeg" alt="logo" width={60} height={60} className="object-contain" />
+          <Link href="/" className="flex-shrink-0 cursor-pointer">
+            <Image src="/images/y1.png" alt="logo" width={60} height={60} className="object-contain" />
           </Link>
 
           {/* Mobile Menu Button */}
@@ -109,48 +122,53 @@ const Nav = () => {
         {isMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden bg-black bg-opacity-50">
             <div className="h-full flex flex-col items-center justify-center space-y-6 bg-[var(--background)]">
-              <Link
-                href="/gallery"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Gallery
-              </Link>
-              <Link
-                href="/paintings"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Paintings
-              </Link>
-              <Link
-                href="/events"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Exhibitions
-              </Link>
-              <Link
-                href="/news"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                News
-              </Link>
-              <Link
-                href="/about"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Bio
-              </Link>
-              <Link
-                href="/contact"
-                className="w-full text-center px-3 py-4 text-2xl font-medium text-[var(--text-secondary)] hover:text-teal-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact
-              </Link>
+              {[
+                { href: '/gallery', text: 'Gallery' },
+                { href: '/paintings', text: 'Paintings' },
+                { href: '/events', text: 'Exhibitions' },
+                { href: '/news', text: 'News' },
+                { href: '/about', text: 'Bio' },
+                { href: '/contact', text: 'Contact' },
+              ].map(({ href, text }) => {
+                const pathname = usePathname();
+                const isActive = pathname === href;
+
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`
+                      relative w-full text-center px-4 py-4 text-2xl font-medium
+                      transition-all duration-300 ease-in-out
+                      
+                      // Text styling with gradient
+                      ${
+                        isActive
+                          ? 'bg-gradient-to-r from-violet-600 via-blue-500 to-teal-400 bg-clip-text text-transparent'
+                          : 'text-[var(--text-secondary)]'
+                      }
+                      hover:bg-gradient-to-r hover:from-violet-600 hover:via-blue-500 hover:to-teal-400
+                      hover:bg-clip-text hover:text-transparent
+                      
+                      // Underline effect
+                      after:content-['']
+                      after:absolute after:bottom-0 after:left-[25%]
+                      after:w-1/2 after:h-[2px]
+                      after:bg-gradient-to-r after:from-violet-600 after:via-blue-500 after:to-teal-400
+                      after:opacity-0 after:scale-x-0
+                      after:transition-all after:duration-300
+                      hover:after:opacity-100 hover:after:scale-x-100
+                      ${isActive ? 'after:opacity-100 after:scale-x-100' : ''}
+                      
+                      // Subtle glow effect
+                      hover:shadow-[0_0_15px_-3px_rgba(139,92,246,0.1)]
+                    `}
+                  >
+                    {text}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

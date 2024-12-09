@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import emailjs from '@emailjs/browser';
 import { Send, Loader2 } from 'lucide-react';
+import { PrimaryButton } from './buttons/PrimaryButton';
 
 interface FormData {
   from_name: string;
@@ -40,7 +41,7 @@ const ContactForm = () => {
   };
 
   return (
-    <form ref={form} onSubmit={sendEmail} className="w-full max-w-lg mx-auto space-y-6">
+    <form ref={form} onSubmit={sendEmail} className="w-full max-w-2xl mx-auto space-y-6">
       <div className="space-y-2">
         <label htmlFor="from_name" className="block text-sm font-medium text-[var(--text-primary)]">
           Name
@@ -53,7 +54,6 @@ const ContactForm = () => {
           className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
-
       <div className="space-y-2">
         <label htmlFor="reply_to" className="block text-sm font-medium text-[var(--text-primary)]">
           Email
@@ -66,7 +66,6 @@ const ContactForm = () => {
           className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
-
       <div className="space-y-2">
         <label htmlFor="message" className="block text-sm font-medium text-[var(--text-primary)]">
           Message
@@ -79,12 +78,7 @@ const ContactForm = () => {
           className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
-
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
+      <PrimaryButton type="submit" disabled={isLoading} className="w-full rounded-md" isLoading={isLoading}>
         {isLoading ? (
           <>
             <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
@@ -96,7 +90,7 @@ const ContactForm = () => {
             Submit
           </>
         )}
-      </button>
+      </PrimaryButton>
     </form>
   );
 };

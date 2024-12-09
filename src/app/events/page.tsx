@@ -1,73 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useEvents } from '@/hooks/useEvents';
 import Event from '@/components/Event';
 import { Plus } from 'lucide-react';
-import { Metadata } from 'next';
 import { useSession } from 'next-auth/react';
+import { PrimaryButton } from '@/components/buttons/PrimaryButton';
+import { useQueryClient } from '@tanstack/react-query';
 import { Event as EventType } from '@/lib/types';
-
-const metadata: Metadata = {
-  title: 'Yasmin Mostoller | Exhibitions',
-  description: 'Imagination and Emotion',
-  openGraph: {
-    title: 'Yasmin Mostoller | Exhibitions',
-    description: 'Imagination and Emotion',
-    type: 'website',
-    images: ['https://yasminmostoller.com/images/slider2.jpg'],
-    url: 'https://yasminmostoller.com/events',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Yasmin Mostoller | Exhibitions',
-    description: 'Imagination and Emotion',
-    images: ['https://yasminmostoller.com/images/slider2.jpg'],
-  },
-};
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<EventType[]>([]);
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin ?? false;
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const res = await fetch('/api/events');
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch events: ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        setEvents(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error('Error fetching events:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load events');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+  const { data: events, isLoading, error } = useEvents();
+  const queryClient = useQueryClient();
 
   const deleteEvent = (deleted_event_id: number) => {
-    setEvents((events) => events.filter((event) => event.id !== deleted_event_id));
+    queryClient.setQueryData(['events'], (oldData: EventType[] | undefined) =>
+      oldData ? oldData.filter((event) => event.id !== deleted_event_id) : []
+    );
   };
 
-  const sortedEvents = events.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1));
+  const sortedEvents = events?.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1)) ?? [];
 
   if (isLoading) {
-    return (
-      <div className="container mx-auto min-h-screen flex items-center justify-center bg-[var(--background-primary)]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -85,7 +42,7 @@ export default function EventsPage() {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-[var(--text-primary)]">{error}</p>
+              <p className="text-sm text-[var(--text-primary)]">{error.message}</p>
             </div>
           </div>
         </div>
@@ -95,21 +52,23 @@ export default function EventsPage() {
 
   return (
     <div className="container mx-auto min-h-screen bg-[var(--background-primary)]">
-      <div className="mt-12 mb-5 text-left container mx-auto px-4">
+      <div className="mt-12 mb-5 text-center container mx-auto px-4">
         {session?.user && isAdmin && (
-          <Link
+          <PrimaryButton
             href="/events/new"
-            className="w-full flex items-center justify-center px-4 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition-colors group"
-            tabIndex={0}
+            icon={Plus}
+            hoverText="Create New Event"
+            className="w-60 rounded-full"
+            showTextOnHover
           >
             <span className="block group-hover:hidden">
               <Plus className="h-6 w-6" />
             </span>
             <span className="hidden group-hover:block">Create New Event</span>
-          </Link>
+          </PrimaryButton>
         )}
 
-        <div className="mt-2">
+        <div className="mt-2 text-left">
           <div className="grid grid-cols-1 gap-2">
             {sortedEvents.map((event) => (
               <Event

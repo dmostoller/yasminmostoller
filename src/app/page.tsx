@@ -2,6 +2,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SecondaryButton } from '@/components/buttons/SecondaryButton';
 
 export const metadata: Metadata = {
   title: 'Yasmin Mostoller | Abstract Artist',
@@ -33,25 +34,23 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 min-h-[90vh] bg-[var(--background-primary)]">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-24">
-        <div className="space-y-6">
+        <div className="space-y-6 mt-24">
           <div className="px-8 py-6 text-[var(--text-secondary)]">
             <h1 className="text-5xl mb-4 text-[var(--text-primary)]">I&apos;m Yasmin,</h1>
             <h1 className="text-2xl">
               I believe in the power of painting to evoke memories and transport us to new realms of thought
-              and feeling. Imagination and emotion shape my vibrant approach to abstract painting.
+              and feeling. Imagination and emotion shape my approach to abstract painting.
             </h1>
+            <p className="text-xl mt-6">
+              &quot;To draw, you must close your eyes and sing.&quot;
+              <br />
+              <span className="italic">-Pablo Picasso</span>
+            </p>
           </div>
           <div className="flex justify-center">
-            <Link
-              href="/gallery"
-              className="inline-block px-8 py-4 text-xl rounded-full border-2 border-teal-500 
-              text-[var(--text-secondary)] hover:bg-teal-500 hover:text-[var(--text-primary)] transition-colors"
-            >
-              Explore My Paintings
-            </Link>
+            <SecondaryButton text="Explore My Paintings" href="/paintings" />
           </div>
         </div>
-
         <div className="flex flex-col items-center">
           <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-[var(--background-secondary)]">
             <Image
@@ -61,13 +60,6 @@ export default function Home() {
               className="object-cover"
               priority
             />
-          </div>
-          <div className="mt-6 mb-6 text-center text-[var(--text-primary)]">
-            <p className="text-xl">
-              &quot;To draw, you must close your eyes and sing.&quot;
-              <br />
-              <span className="italic">-Pablo Picasso</span>
-            </p>
           </div>
         </div>
       </div>

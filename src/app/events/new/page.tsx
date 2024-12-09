@@ -72,13 +72,13 @@ export default function AddEvent() {
 
           <div className="space-y-4">
             <label className="flex justify-between items-center text-[var(--text-primary)]">
-              <span>Upload image, then enter event info...</span>
+              <span>Enter event info...</span>
               <Link href="/events" className="flex items-center text-teal-600 hover:text-teal-700">
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Back to Events Page
               </Link>
             </label>
-
+            {/* 
             <UploadWidget onSetImageUrl={setImageUrl} />
 
             {imageUrl && (
@@ -95,6 +95,7 @@ export default function AddEvent() {
               className="hidden"
             />
             {formik.errors.image_url && <p className="text-red-500 text-center">{formik.errors.image_url}</p>}
+             */}
           </div>
 
           <div className="space-y-4">

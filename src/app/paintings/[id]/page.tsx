@@ -14,7 +14,7 @@ async function getPainting(id: string): Promise<Painting> {
     }`;
 
   const res = await fetch(`${baseUrl}/api/paintings/${id}`, {
-    next: { revalidate: 60 }
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {
@@ -43,16 +43,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: painting.image || '',
           width: 1200,
           height: 630,
-          alt: painting.title
-        }
-      ]
+          alt: painting.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: painting.title,
       description: `View ${painting.title} painting details`,
-      images: [painting.image || '']
-    }
+      images: [painting.image || ''],
+    },
   };
 }
 export default async function Page({ params }: PageProps) {

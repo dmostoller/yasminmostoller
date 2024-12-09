@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { DollarSign, Loader } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import type { Swiper as SwiperType } from 'swiper';
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import { usePaintings } from '@/hooks/usePaintings';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -14,31 +15,36 @@ import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 import { Painting } from '@/lib/types';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const Gallery: React.FC = () => {
-  const [paintings, setPaintings] = useState<Painting[]>([]);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: paintings, isLoading, error } = usePaintings();
 
-  useEffect(() => {
-    const fetchPaintings = async () => {
-      const res = await fetch('/api/paintings');
-      const data = await res.json();
-      setPaintings(data);
-      setLoading(false);
-    };
-    fetchPaintings();
-  }, []);
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
-  const gallery = paintings.map((painting) => (
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[90vh]">
+        <p className="text-xl text-red-600">Error loading gallery: {error.message}</p>
+      </div>
+    );
+  }
+
+  if (!paintings) return null;
+
+  const gallery = paintings.map((painting: Painting) => (
     <SwiperSlide key={painting.id}>
       <div className="relative w-full aspect-square">
         <Image
           fill
           className="object-contain"
           alt={painting.title}
-          src={painting.image}
+          src={painting.image || ''}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 1200px"
+          unoptimized // Add this if image URLs are from external source
         />
       </div>
       <div className="py-4 md:py-6 px-3 md:px-4 space-y-2">
@@ -61,30 +67,20 @@ const Gallery: React.FC = () => {
     </SwiperSlide>
   ));
 
-  const thumbGallery = paintings.map((painting) => (
+  const thumbGallery = paintings.map((painting: Painting) => (
     <SwiperSlide key={painting.id}>
       <div className="relative w-full aspect-square">
         <Image
           fill
           className="object-cover rounded cursor-pointer"
           alt={painting.title}
-          src={painting.image}
+          src={painting.image || ''}
           sizes="(max-width: 300px) 100vw, 300px"
+          unoptimized // Add this if image URLs are from external source
         />
       </div>
     </SwiperSlide>
   ));
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[90vh]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader className="w-10 h-10 animate-spin text-blue-500" />
-          <p className="text-xl text-gray-600">Loading gallery...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <main className="container mx-auto mt-12 min-h-screen max-w-7xl px-4">

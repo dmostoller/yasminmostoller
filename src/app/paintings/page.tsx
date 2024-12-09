@@ -1,85 +1,48 @@
-// page.tsx
 'use client';
-import React, { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
-import { Plus, Folder } from 'lucide-react';
+import React, { useState, Suspense } from 'react';
+import { Plus } from 'lucide-react';
 import PaintingsList from '@/components/PaintingsList';
 import PaintingSkeleton from '@/components/PaintingSkeleton';
 import Search from '@/components/Search';
 import { useSession } from 'next-auth/react';
-// import AddFolder from './AddFolder';
-import type { Painting, Folder as FolderType } from '@/lib/types';
+import { usePaintings } from '@/hooks/usePaintings';
+import { useFolders } from '@/hooks/useFolders';
+import type { Painting } from '@/lib/types';
+import { PrimaryButton } from '@/components/buttons/PrimaryButton';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 const ITEMS_PER_PAGE = 6;
 
 export default function PaintingsPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin ?? false;
-  const [paintings, setPaintings] = useState<Painting[]>([]);
-  const [folders, setFolders] = useState<FolderType[]>([]);
+  const { data: paintings, isLoading: paintingsLoading, error: paintingsError } = usePaintings();
+  const { data: folders, isLoading: foldersLoading } = useFolders();
+
   const [selectedFolder, setSelectedFolder] = useState('none');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQ, setSearchQ] = useState('');
   const [sortBy, setSortBy] = useState('Default');
   const [forSale, setForSale] = useState(false);
-  const [showFolderInput, setShowFolderInput] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        // Fetch paintings
-        const paintingsRes = await fetch('/api/paintings');
-        if (!paintingsRes.ok) {
-          throw new Error('Failed to fetch paintings');
-        }
-        const paintingsData = await paintingsRes.json();
-        setPaintings(paintingsData);
-
-        // Fetch folders
-        const foldersRes = await fetch('/api/folders');
-        const foldersData = await foldersRes.json();
-        setFolders(foldersData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-        console.error('Error fetching data:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    // Reset to page 1 whenever filters change
-    setCurrentPage(1);
-  }, [searchQ, sortBy, forSale, selectedFolder]);
-
-  // Helper functions
-  function toggleFolderInput() {
-    setShowFolderInput((prevVal) => !prevVal);
+  if (paintingsLoading || foldersLoading) {
+    return <LoadingSpinner />;
   }
 
-  if (isLoading) {
+  // Error state
+  if (paintingsError) {
     return (
-      <div className="container mx-auto min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+      <div className="flex justify-center items-center min-h-screen text-red-500">
+        {paintingsError.message}
       </div>
     );
   }
 
-  if (error) {
-    return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
-  }
-
-  const results = paintings.filter((painting) => {
+  const results = paintings.filter((painting: Painting) => {
     return painting.title.toLowerCase().includes(searchQ.toLowerCase());
   });
 
-  const searchResults = results.filter((painting) => {
+  const searchResults = results.filter((painting: Painting) => {
     if (forSale === true) {
       return painting.sold !== true;
     } else {
@@ -88,20 +51,20 @@ export default function PaintingsPage() {
   });
 
   if (sortBy === 'Small') {
-    searchResults.sort((a, b) =>
+    searchResults.sort((a: Painting, b: Painting) =>
       (a.width ?? 0) * (a.height ?? 0) < (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
     );
   } else if (sortBy === 'Large') {
-    searchResults.sort((a, b) =>
+    searchResults.sort((a: Painting, b: Painting) =>
       (a.width ?? 0) * (a.height ?? 0) > (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
     );
   } else if (sortBy === 'Low') {
-    searchResults.sort((a, b) => ((a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1));
+    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1));
   } else if (sortBy === 'High') {
-    searchResults.sort((a, b) => ((a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1));
+    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1));
   }
 
-  const folderResults = searchResults.filter((painting) => {
+  const folderResults = searchResults.filter((painting: Painting) => {
     if (selectedFolder !== 'none') {
       if (painting.folder_id === parseInt(selectedFolder, 10)) {
         console.log(painting.folder_id);
@@ -119,10 +82,6 @@ export default function PaintingsPage() {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
-
-  const addFolder = (newFolder: FolderType) => {
-    setFolders([...folders, newFolder]);
-  };
 
   const handleSortBy = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
@@ -142,32 +101,13 @@ export default function PaintingsPage() {
           sortBy={handleSortBy}
           forSale={forSale}
           setForSale={setForSale}
-          folders={folders}
+          folders={folders ?? []}
           selectedFolder={selectedFolder}
           setSelectedFolder={handleSelectedFolder}
         />
         {session?.user && isAdmin && (
           <div className="grid place-items-center pt-5">
-            <Link
-              href="/paintings/new"
-              className="inline-flex items-center rounded-full bg-teal-600 px-4 py-2 text-white hover:bg-teal-700"
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              Add Painting
-            </Link>
-            {/* 
-            {showFolderInput ? (
-              <></>
-            ) : (
-              //   <AddFolder onToggleFolder={toggleFolderInput} onAddFolder={addFolder} />
-              <button
-                className="ml-4 inline-flex items-center rounded-full bg-teal-600 px-4 py-2 text-white hover:bg-teal-700"
-                onClick={toggleFolderInput}
-              >
-                <Folder className="mr-2 h-5 w-5" />
-                Create Folder
-              </button>
-            )} */}
+            <PrimaryButton text="Add Painting" href="/paintings/new" icon={Plus} className="rounded-full" />
           </div>
         )}
       </div>
@@ -180,7 +120,11 @@ export default function PaintingsPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 rounded bg-teal-600 text-white disabled:bg-gray-300"
+              className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
+                         px-4 py-2 text-white rounded
+                         hover:from-violet-700 hover:via-blue-600 hover:to-teal-500 
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         transition-all shadow-sm"
             >
               Previous
             </button>
@@ -190,7 +134,11 @@ export default function PaintingsPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded bg-teal-600 text-white disabled:bg-gray-300"
+              className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
+                         px-4 py-2 text-white rounded
+                         hover:from-violet-700 hover:via-blue-600 hover:to-teal-500 
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         transition-all shadow-sm"
             >
               Next
             </button>

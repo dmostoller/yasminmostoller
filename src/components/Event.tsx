@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Event } from '@/lib/types';
 import FormattedContent from '@/components/FormattedContent';
+import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 
 interface EventProps extends Event {
   isAdmin: boolean;
@@ -55,18 +56,8 @@ export default function Event({
           <div className="flex gap-4 mt-4">
             {session?.user && isAdmin ? (
               <>
-                <Link
-                  href={`/events/${id}/edit`}
-                  className="inline-flex items-center justify-center p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-                >
-                  <Pencil className="w-5 h-5" />
-                </Link>
-                <button
-                  onClick={handleDeleteEvent}
-                  className="inline-flex items-center justify-center p-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
+                <PrimaryIconButton href={`/events/${id}/edit`} icon={Pencil} />
+                <PrimaryIconButton onClick={handleDeleteEvent} icon={Trash2} />
               </>
             ) : null}
           </div>

@@ -63,24 +63,26 @@ export default function UserPage() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-50">
+    <div className="flex min-h-screen flex-col items-center bg-[var(--background)]">
       <div className="w-full max-w-6xl mt-12">
         {/* My Account Section - Always visible */}
-        <h4 className="relative my-8 text-center text-lg font-semibold text-gray-700 before:absolute before:left-0 before:top-1/2 before:w-full before:border-t before:border-gray-300">
-          <span className="relative bg-gray-50 px-6">My Account</span>
+        <h4 className="relative my-8 text-center text-lg font-semibold text-[var(--text-primary)] 
+                       before:absolute before:left-0 before:top-1/2 before:w-full 
+                       before:border-t before:border-[var(--border)]">
+          <span className="relative bg-[var(--background)] px-6">My Account</span>
         </h4>
-
+  
         <div className="flex justify-center">
-          <div className="m-6 rounded-lg border border-gray-300 bg-white p-8 shadow-md text-center">
+          <div className="m-6 rounded-lg border border-[var(--border)] bg-[var(--background-elevated)] p-8 shadow-md text-center">
             {user && (
               <>
-                <div className="text-xl font-semibold text-gray-800">{user.username}</div>
-                <div className="text-sm text-gray-600">{user.email}</div>
+                <div className="text-xl font-semibold text-[var(--text-primary)]">{user.username}</div>
+                <div className="text-sm text-[var(--text-secondary)]">{user.email}</div>
               </>
             )}
           </div>
         </div>
-
+  
         {/* Admin-only content */}
         {isAdmin && (
           <>
@@ -101,13 +103,15 @@ export default function UserPage() {
                 Contest Admin Panel
               </Link>
             </div>
-
+  
             {/* Folders Section */}
             <div className="w-full max-w-6xl mt-12">
-              <h4 className="relative my-8 text-center text-lg font-semibold text-gray-700 before:absolute before:left-0 before:top-1/2 before:w-full before:border-t before:border-gray-300">
-                <span className="relative bg-gray-50 px-6">Folders</span>
+              <h4 className="relative my-8 text-center text-lg font-semibold text-[var(--text-primary)]
+                            before:absolute before:left-0 before:top-1/2 before:w-full 
+                            before:border-t before:border-[var(--border)]">
+                <span className="relative bg-[var(--background)] px-6">Folders</span>
               </h4>
-
+  
               <div className="flex flex-col items-center">
                 <div className="mb-6">
                   {showFolderInput ? (
@@ -130,4 +134,3 @@ export default function UserPage() {
       </div>
     </div>
   );
-}

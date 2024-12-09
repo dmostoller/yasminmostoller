@@ -13,7 +13,6 @@ export default function ContactPage() {
     <div className="min-h-screen py-24">
       <div className="container mx-auto px-4 max-w-2xl text-center space-y-6">
         <div className="flex items-center justify-center mb-6">
-          <MessageSquare className="w-8 h-8 text-teal-600 mr-2" />
           <h1 className="text-4xl font-bold text-[var(--text-primary)]">Get In Touch</h1>
         </div>
 

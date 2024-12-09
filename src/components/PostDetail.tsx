@@ -14,6 +14,7 @@ import DateFormat from '@/components/DateFormat';
 import { CldImage } from 'next-cloudinary';
 import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
+import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 
 interface PostDetailProps {
   post: Post;
@@ -83,23 +84,11 @@ export default function PostDetail({ post }: PostDetailProps) {
               <FormattedContent content={post.content || ''} />
             </div>
             <div className="flex gap-2 pt-4">
-              <Link href="/news" className="rounded-full bg-teal-600 p-2 text-white hover:bg-teal-700">
-                <Undo className="h-5 w-5" />
-              </Link>
+              <PrimaryIconButton href="/news" icon={Undo} />
               {session?.user && isAdmin && (
                 <>
-                  <Link
-                    href={`/news/${post.id}/edit`}
-                    className="rounded-full bg-teal-600 p-2 text-white hover:bg-teal-700"
-                  >
-                    <Edit className="h-5 w-5" />
-                  </Link>
-                  <button
-                    onClick={handleDeletePost}
-                    className="rounded-full bg-teal-600 p-2 text-white hover:bg-teal-700"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
+                  <PrimaryIconButton href={`/news/${post.id}/edit`} icon={Edit} />
+                  <PrimaryIconButton onClick={handleDeletePost} icon={Trash2} />
                 </>
               )}
             </div>

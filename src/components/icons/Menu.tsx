@@ -34,7 +34,10 @@ const MenuIcon = ({ isOpen, onToggle }: MenuIconProps) => {
 
   return (
     <div
-      className="cursor-pointer select-none p-2 hover:bg-accent rounded-md transition-colors duration-200 flex items-center justify-center"
+      className="cursor-pointer select-none p-2 rounded-md transition-all duration-300
+                 bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
+                 hover:from-violet-700 hover:via-blue-600 hover:to-teal-500
+                 text-white shadow-sm"
       onClick={handleToggle}
     >
       <svg

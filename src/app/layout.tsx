@@ -4,6 +4,7 @@ import './globals.css';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ClientSessionProvider from '@/context/ClientSessionProvider';
+import ClientQueryProvider from '@/context/ClientQueryProvider';
 import Script from 'next/script';
 import Head from 'next/head';
 
@@ -44,22 +45,21 @@ export default function RootLayout({
         />
       </Head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)] max-h-[80vh]`}
       >
-        <ClientSessionProvider>
-          <Nav />
-          <main className="flex-grow pt-[72px]">{children}</main>
-          <Footer />
-        </ClientSessionProvider>
+        <ClientQueryProvider>
+          <ClientSessionProvider>
+            <Nav />
+            <main className="flex-grow pt-[72px]">{children}</main>
+            <Footer />
+          </ClientSessionProvider>
+        </ClientQueryProvider>
         <Script
           src="https://cdnjs.cloudflare.com/ajax/libs/cloudinary-video-player/2.0.2/cld-video-player.min.js"
           crossOrigin="anonymous"
           strategy="beforeInteractive"
         />
-        <Script
-          src="https://upload-widget.cloudinary.com/global/all.js"
-          strategy="beforeInteractive"
-        />
+        <Script src="https://upload-widget.cloudinary.com/global/all.js" strategy="beforeInteractive" />
       </body>
     </html>
   );

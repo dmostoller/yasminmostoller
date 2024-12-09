@@ -8,6 +8,7 @@ import DateFormat from '@/components/DateFormat';
 import { CldImage } from 'next-cloudinary';
 import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
+import { SecondaryButton } from './buttons/SecondaryButton';
 
 const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_added, isAdmin }) => {
   return (
@@ -16,7 +17,7 @@ const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_add
       {image_url !== 'undefined' && image_url !== null && image_url !== 'null' && (
         <div>
           <CldImage
-            width="960"
+            width="800"
             height="600"
             src={image_url || ''}
             alt={title || 'Post image'}
@@ -39,13 +40,7 @@ const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_add
           <FormattedContent content={content || ''} />
         </div>
         <div className="mt-6">
-          <Link
-            href={`/news/${id}`}
-            className="inline-flex items-center justify-center px-4 h-10 rounded-full bg-transparent border border-teal-500 text-teal-500 hover:bg-teal-50 transition-colors gap-2"
-          >
-            <span>Go to Post</span>
-            <ExternalLink className="h-5 w-5" />
-          </Link>
+          <SecondaryButton text="Go to Post" href={`/news/${id}`} icon={ExternalLink} />
         </div>
       </div>
     </div>

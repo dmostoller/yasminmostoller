@@ -104,7 +104,7 @@ export default function EditEvent({ params }: { params: Promise<{ id: number }> 
               </span>
             </label>
 
-            <UploadWidget onSetImageUrl={setImageUrl} />
+            {/* <UploadWidget onSetImageUrl={setImageUrl} />
 
             {imageUrl && (
               <div className="relative h-64 w-full overflow-hidden rounded-lg">
@@ -117,7 +117,7 @@ export default function EditEvent({ params }: { params: Promise<{ id: number }> 
               name="image_url"
               value={formik.values.image_url}
               onChange={formik.handleChange}
-            />
+            /> */}
           </div>
 
           <div className="space-y-4">
