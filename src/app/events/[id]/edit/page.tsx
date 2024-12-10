@@ -1,48 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import UploadWidget from '@/components/UploadWidget';
-import type { Event } from '@/lib/types';
 import { Editor } from '@tinymce/tinymce-react';
+import { useEvents } from '@/hooks/useEvents';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function EditEvent({ params }: { params: Promise<{ id: number }> }) {
   const unwrappedParams = React.use(params);
   const id = unwrappedParams.id;
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [event, setEvent] = useState<Event>({
-    id: id,
-    name: '',
-    venue: '',
-    location: '',
-    details: '',
-    image_url: '',
-    event_date: '',
-    event_link: '',
-  });
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { events, updateEvent, isLoading } = useEvents();
 
-  useEffect(() => {
-    fetch(`/api/events/${id}`)
-      .then((res) => res.json())
-      .then((eventData) => {
-        setEvent(eventData);
-        setImageUrl(eventData.image_url || null);
-      });
-  }, [id]);
+  const currentEvent = events.find(e => {
+    return Number(e.id) === Number(id);
+  });
 
   const formSchema = yup.object().shape({
-    name: yup.string().required('Please enter a title').min(2, 'Name must be more than two characters long'),
+    name: yup
+      .string()
+      .required('Please enter a title')
+      .min(2, 'Name must be more than two characters long'),
     venue: yup.string().required('Please enter a venue'),
     location: yup.string().required('Please enter a location'),
     details: yup.string().required('Please enter event details'),
-    image_url: yup.string().nullable(),
     event_date: yup.date().required('Please enter a date'),
     event_link: yup.string().required('Please enter an event link'),
   });
@@ -50,39 +36,37 @@ export default function EditEvent({ params }: { params: Promise<{ id: number }> 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: event.name || '',
-      venue: event.venue || '',
-      location: event.location || '',
-      details: event.details || '',
-      image_url: imageUrl || '',
-      event_date: event.event_date || '',
-      event_link: event.event_link || '',
+      name: currentEvent?.name || '',
+      venue: currentEvent?.venue || '',
+      location: currentEvent?.location || '',
+      details: currentEvent?.details || '',
+      event_date: currentEvent?.event_date || '',
+      event_link: currentEvent?.event_link || '',
     },
     validationSchema: formSchema,
     validateOnMount: false,
-    onSubmit: async (values) => {
-      const submitValues = {
-        ...values,
-        image_url: values.image_url || null,
-      };
-
-      const res = await fetch(`/api/events/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(submitValues),
-      });
-
-      if (res.ok) {
-        await res.json();
-        router.push('/events');
-      } else {
-        const errorData = await res.json();
-        setError(errorData.message);
-      }
+    onSubmit: values => {
+      updateEvent(
+        { ...values, id },
+        {
+          onSuccess: () => {
+            router.push('/events');
+          },
+          onError: error => {
+            setError(error.message);
+          },
+        }
+      );
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="text-center mt-8">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -97,27 +81,15 @@ export default function EditEvent({ params }: { params: Promise<{ id: number }> 
             <label className="block">
               <span className="flex items-center justify-between text-[var(--text-primary)]">
                 Upload image then enter event info...
-                <Link href="/events" className="flex items-center text-teal-600 hover:text-teal-700">
+                <Link
+                  href="/events"
+                  className="flex items-center text-teal-600 hover:text-teal-700"
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to Events
                 </Link>
               </span>
             </label>
-
-            {/* <UploadWidget onSetImageUrl={setImageUrl} />
-
-            {imageUrl && (
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <Image src={imageUrl} alt="Event image" fill className="object-cover" priority />
-              </div>
-            )}
-
-            <input
-              type="hidden"
-              name="image_url"
-              value={formik.values.image_url}
-              onChange={formik.handleChange}
-            /> */}
           </div>
 
           <div className="space-y-4">
@@ -223,20 +195,22 @@ export default function EditEvent({ params }: { params: Promise<{ id: number }> 
                     'bold italic forecolor | alignleft aligncenter ' +
                     'alignright alignjustify | bullist numlist outdent indent | ' +
                     'removeformat | help',
-                  setup: (editor) => {
+                  setup: editor => {
                     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                     editor.options.set('skin', isDarkMode ? 'oxide-dark' : 'oxide');
                     editor.options.set('content_css', isDarkMode ? 'dark' : 'default');
 
                     // Listen for system theme changes
-                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                      editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
-                      editor.options.set('content_css', e.matches ? 'dark' : 'default');
-                    });
+                    window
+                      .matchMedia('(prefers-color-scheme: dark)')
+                      .addEventListener('change', e => {
+                        editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
+                        editor.options.set('content_css', e.matches ? 'dark' : 'default');
+                      });
                   },
                 }}
                 value={formik.values.details}
-                onEditorChange={(content) => {
+                onEditorChange={content => {
                   formik.setFieldValue('details', content);
                 }}
               />

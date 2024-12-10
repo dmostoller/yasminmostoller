@@ -1,15 +1,17 @@
 // components/PostCommentForm.tsx
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { X } from 'lucide-react';
-import { User } from '@/lib/types';
+import { User, PostComment } from '@/lib/types';
+import { PrimaryButton } from './buttons/PrimaryButton';
+import { usePostComments } from '@/hooks/usePostComments';
 
 interface PostCommentFormProps {
-  onAddComment: (comment: any) => void;
-  postId: string;
+  onAddComment: (comment: PostComment) => void;
+  postId: number;
   onChangeIsComFormVis: () => void;
   user: User;
 }
@@ -20,6 +22,7 @@ export default function PostCommentForm({
   onChangeIsComFormVis,
   user,
 }: PostCommentFormProps) {
+  const { addPostComment } = usePostComments();
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
@@ -30,40 +33,35 @@ export default function PostCommentForm({
     initialValues: {
       comment: '',
       date_added: `${new Date().toLocaleDateString('en-US')} ${new Date().toLocaleTimeString('en-US')}`,
-      post_id: parseInt(postId),
+      post_id: postId,
       user_id: user.id,
     },
     validationSchema: formSchema,
-    onSubmit: async (values) => {
-      try {
-        const res = await fetch('/api/post_comments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-
-        if (res.ok) {
-          const newComment = await res.json();
+    onSubmit: values => {
+      addPostComment(values, {
+        onSuccess: newComment => {
           onAddComment(newComment);
           formik.resetForm();
-        } else {
-          const errorData = await res.json();
-          setError(errorData.message);
-        }
-      } catch (err) {
-        setError('Failed to submit comment');
-      }
+        },
+        onError: error => {
+          setError(error.message);
+        },
+      });
     },
   });
 
-    return (
+  return (
     <div className="container mx-auto max-w-2xl">
-      <form onSubmit={formik.handleSubmit} className="bg-[var(--background-secondary)] shadow-sm rounded-lg p-4">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="bg-[var(--background-secondary)] shadow-sm rounded-lg p-4"
+      >
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label htmlFor="comment" className="block text-sm font-medium text-[var(--text-primary)]">
+            <label
+              htmlFor="comment"
+              className="block text-sm font-medium text-[var(--text-primary)]"
+            >
               Add Comment
             </label>
             <button
@@ -88,14 +86,12 @@ export default function PostCommentForm({
           )}
         </div>
         <div className="mt-4">
-          <button
-            type="submit"
-            className="w-full rounded-full bg-teal-500 py-2 px-4 text-sm font-medium text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-          >
+          <PrimaryButton type="submit" className="rounded-full w-full">
             Submit
-          </button>
+          </PrimaryButton>
         </div>
       </form>
       {error && <div className="mt-2 text-red-500 text-center">{error}</div>}
     </div>
   );
+}

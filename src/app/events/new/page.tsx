@@ -5,23 +5,20 @@ import { useRouter } from 'next/navigation';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import Link from 'next/link';
-import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import { Event } from '@/lib/types';
-import UploadWidget from '@/components/UploadWidget';
 import { Editor } from '@tinymce/tinymce-react';
+import { useEvents } from '@/hooks/useEvents';
 
 export default function AddEvent() {
   const router = useRouter();
+  const { createEvent } = useEvents();
   const [error, setError] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>('');
 
   const formSchema = yup.object().shape({
     name: yup.string().required('Please enter a title'),
     venue: yup.string().required('Please enter a venue'),
     location: yup.string().required('Please enter a location'),
     details: yup.string().required('Please enter event details'),
-    image_url: yup.string().required('Please enter an image link'),
     event_date: yup.date().required('Please enter a date'),
     event_link: yup.string().required('Please enter an event link'),
   });
@@ -33,31 +30,19 @@ export default function AddEvent() {
       venue: '',
       location: '',
       details: '',
-      image_url: imageUrl,
       event_date: '',
       event_link: '',
     },
     validationSchema: formSchema,
-    onSubmit: async (values) => {
-      try {
-        const res = await fetch('/api/events', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-
-        if (res.ok) {
-          const event = await res.json();
+    onSubmit: values => {
+      createEvent(values, {
+        onSuccess: () => {
           router.push('/events');
-        } else {
-          const errorData = await res.json();
-          setError(errorData.message);
-        }
-      } catch (err) {
-        setError('An error occurred while submitting the form');
-      }
+        },
+        onError: error => {
+          setError(error.message);
+        },
+      });
     },
   });
 
@@ -78,26 +63,7 @@ export default function AddEvent() {
                 Back to Events Page
               </Link>
             </label>
-            {/* 
-            <UploadWidget onSetImageUrl={setImageUrl} />
-
-            {imageUrl && (
-              <div className="relative w-full h-64 overflow-hidden rounded-lg">
-                <Image src={imageUrl} alt="Event preview" fill className="object-cover" />
-              </div>
-            )}
-
-            <input
-              type="text"
-              name="image_url"
-              value={formik.values.image_url}
-              onChange={formik.handleChange}
-              className="hidden"
-            />
-            {formik.errors.image_url && <p className="text-red-500 text-center">{formik.errors.image_url}</p>}
-             */}
           </div>
-
           <div className="space-y-4">
             <div className="space-y-2">
               <input
@@ -108,9 +74,10 @@ export default function AddEvent() {
                 onChange={formik.handleChange}
                 className="w-full rounded-md border border-[var(--text-secondary)] px-4 py-2 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 bg-[var(--background-secondary)] text-[var(--text-primary)]"
               />
-              {formik.errors.name && <p className="text-red-500 text-center text-sm">{formik.errors.name}</p>}
+              {formik.errors.name && (
+                <p className="text-red-500 text-center text-sm">{formik.errors.name}</p>
+              )}
             </div>
-
             <div className="space-y-2">
               <input
                 type="text"
@@ -124,7 +91,6 @@ export default function AddEvent() {
                 <p className="text-red-500 text-center text-sm">{formik.errors.venue}</p>
               )}
             </div>
-
             <div className="space-y-2">
               <input
                 type="text"
@@ -138,7 +104,6 @@ export default function AddEvent() {
                 <p className="text-red-500 text-center text-sm">{formik.errors.location}</p>
               )}
             </div>
-
             <div className="space-y-2">
               <input
                 type="date"
@@ -151,7 +116,6 @@ export default function AddEvent() {
                 <p className="text-red-500 text-center text-sm">{formik.errors.event_date}</p>
               )}
             </div>
-
             <div className="space-y-2">
               <input
                 type="text"
@@ -165,7 +129,6 @@ export default function AddEvent() {
                 <p className="text-red-500 text-center text-sm">{formik.errors.event_link}</p>
               )}
             </div>
-
             <div className="space-y-2">
               <Editor
                 apiKey={process.env.NEXT_PUBLIC_TINY_API_KEY}
@@ -202,20 +165,22 @@ export default function AddEvent() {
                     'bold italic forecolor | alignleft aligncenter ' +
                     'alignright alignjustify | bullist numlist outdent indent | ' +
                     'removeformat | help',
-                  setup: (editor) => {
+                  setup: editor => {
                     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                     editor.options.set('skin', isDarkMode ? 'oxide-dark' : 'oxide');
                     editor.options.set('content_css', isDarkMode ? 'dark' : 'default');
 
                     // Listen for system theme changes
-                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                      editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
-                      editor.options.set('content_css', e.matches ? 'dark' : 'default');
-                    });
+                    window
+                      .matchMedia('(prefers-color-scheme: dark)')
+                      .addEventListener('change', e => {
+                        editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
+                        editor.options.set('content_css', e.matches ? 'dark' : 'default');
+                      });
                   },
                 }}
                 value={formik.values.details}
-                onEditorChange={(content) => {
+                onEditorChange={content => {
                   formik.setFieldValue('details', content);
                 }}
               />
@@ -223,7 +188,6 @@ export default function AddEvent() {
                 <p className="text-red-500 text-center text-sm">{formik.errors.details}</p>
               )}
             </div>
-
             <button
               type="submit"
               className="w-full rounded-full bg-teal-500 py-2 text-white transition-colors hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:ring-offset-2"

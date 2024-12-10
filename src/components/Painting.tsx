@@ -28,7 +28,7 @@ export default function Painting(props: PaintingType) {
         <h3 className="font-semibold text-[var(--text-primary)]">{title}</h3>
         {materials && <p className="text-sm text-[var(--text-secondary)]">{materials}</p>}
         <p className="text-sm text-[var(--text-secondary)]">
-          {width}" x {height}"
+          {width}&quot; x {height}&quot;
         </p>
         <div className="text-sm font-medium">
           {sold ? (

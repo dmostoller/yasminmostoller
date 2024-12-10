@@ -5,23 +5,15 @@ import Event from '@/components/Event';
 import { Plus } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { PrimaryButton } from '@/components/buttons/PrimaryButton';
-import { useQueryClient } from '@tanstack/react-query';
-import { Event as EventType } from '@/lib/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function EventsPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin ?? false;
-  const { data: events, isLoading, error } = useEvents();
-  const queryClient = useQueryClient();
+  const { events, isLoading, error, deleteEvent } = useEvents();
 
-  const deleteEvent = (deleted_event_id: number) => {
-    queryClient.setQueryData(['events'], (oldData: EventType[] | undefined) =>
-      oldData ? oldData.filter((event) => event.id !== deleted_event_id) : []
-    );
-  };
-
-  const sortedEvents = events?.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1)) ?? [];
+  const sortedEvents =
+    events?.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1)) ?? [];
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -51,8 +43,8 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="container mx-auto min-h-screen bg-[var(--background-primary)]">
-      <div className="mt-12 mb-5 text-center container mx-auto px-4">
+    <div className=" container mx-auto min-h-screen bg-[var(--background-primary)]">
+      <div className="mt-12 mb-5 text-center container mx-auto px-2">
         {session?.user && isAdmin && (
           <PrimaryButton
             href="/events/new"
@@ -68,9 +60,9 @@ export default function EventsPage() {
           </PrimaryButton>
         )}
 
-        <div className="mt-2 text-left">
+        <div className="mt-2 text-left max-w-screen-xl mx-auto">
           <div className="grid grid-cols-1 gap-2">
-            {sortedEvents.map((event) => (
+            {sortedEvents.map(event => (
               <Event
                 key={event.id}
                 id={event.id}

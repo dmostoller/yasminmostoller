@@ -1,4 +1,4 @@
-import parse, { HTMLReactParserOptions } from 'html-react-parser';
+import parse, { HTMLReactParserOptions, DOMNode, Element } from 'html-react-parser';
 
 interface FormattedContentProps {
   content: string;
@@ -6,8 +6,8 @@ interface FormattedContentProps {
 
 const FormattedContent = ({ content }: FormattedContentProps) => {
   const options: HTMLReactParserOptions = {
-    replace: (domNode: any) => {
-      if (domNode.name === 'a' && domNode.attribs) {
+    replace: (domNode: DOMNode) => {
+      if (domNode instanceof Element && domNode.name === 'a' && domNode.attribs) {
         // Add target and rel attributes to external links
         return {
           ...domNode,
@@ -21,7 +21,6 @@ const FormattedContent = ({ content }: FormattedContentProps) => {
       }
     },
   };
-
   return (
     <div className="text-[var(--text-secondary)] prose prose-teal max-w-none prose-a:no-underline">
       {parse(content || '', options)}

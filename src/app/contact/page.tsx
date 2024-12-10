@@ -1,7 +1,6 @@
 // app/contact/page.tsx
 import { Metadata } from 'next';
 import ContactForm from '@/components/ContactForm';
-import { MessageSquare } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Contact - Get In Touch',
@@ -21,10 +20,10 @@ export default function ContactPage() {
         </h2>
 
         <p className="text-[var(--text-secondary)] leading-relaxed">
-          If you are interested in purchasing any of the paintings shown here, or if you would like to
-          commission a custom work, I would be happy to discuss this with you. Please fill out the form below
-          with as much information as possible, and I will get back to you as soon as I can. Thank you very
-          much.
+          If you are interested in purchasing any of the paintings shown here, or if you would like
+          to commission a custom work, I would be happy to discuss this with you. Please fill out
+          the form below with as much information as possible, and I will get back to you as soon as
+          I can. Thank you very much.
         </p>
       </div>
 

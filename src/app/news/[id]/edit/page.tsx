@@ -31,8 +31,8 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
 
   useEffect(() => {
     fetch(`/api/posts/${id}`)
-      .then((res) => res.json())
-      .then((post) => {
+      .then(res => res.json())
+      .then(post => {
         setPost(post);
         setImageUrl(post.image_url || null);
         setVideoUrl(post.video_url || null);
@@ -40,7 +40,10 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
   }, [id]);
 
   const formSchema = yup.object().shape({
-    title: yup.string().required('Please enter a title').min(2, 'Name must be more than two characters long'),
+    title: yup
+      .string()
+      .required('Please enter a title')
+      .min(2, 'Name must be more than two characters long'),
     content: yup.string().required('Please enter content for your post'),
   });
 
@@ -54,7 +57,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
     },
     validationSchema: formSchema,
     validateOnMount: false,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       const submitValues = {
         ...values,
         image_url: values.image_url || null,
@@ -69,7 +72,7 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
       });
 
       if (res.ok) {
-        const post = await res.json();
+        // const post = await res.json();
         router.push(`/news/${id}`);
       } else {
         const error = await res.json();
@@ -90,7 +93,10 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
             <label className="block">
               <span className="flex items-center justify-between text-foreground">
                 Upload image or video then enter post info...
-                <Link href={`/news/${id}`} className="flex items-center text-teal-600 hover:text-teal-700">
+                <Link
+                  href={`/news/${id}`}
+                  className="flex items-center text-teal-600 hover:text-teal-700"
+                >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Back to post
                 </Link>
@@ -181,20 +187,22 @@ export default function EditPost({ params }: { params: Promise<{ id: number }> }
                   'bold italic forecolor | alignleft aligncenter ' +
                   'alignright alignjustify | bullist numlist outdent indent | ' +
                   'removeformat | help',
-                setup: (editor) => {
+                setup: editor => {
                   const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   editor.options.set('skin', isDarkMode ? 'oxide-dark' : 'oxide');
                   editor.options.set('content_css', isDarkMode ? 'dark' : 'default');
 
                   // Listen for system theme changes
-                  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                    editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
-                    editor.options.set('content_css', e.matches ? 'dark' : 'default');
-                  });
+                  window
+                    .matchMedia('(prefers-color-scheme: dark)')
+                    .addEventListener('change', e => {
+                      editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
+                      editor.options.set('content_css', e.matches ? 'dark' : 'default');
+                    });
                 },
               }}
               value={formik.values.content}
-              onEditorChange={(content) => {
+              onEditorChange={content => {
                 formik.setFieldValue('content', content);
               }}
             />

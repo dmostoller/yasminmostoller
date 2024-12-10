@@ -83,7 +83,6 @@ export interface Post {
   date_added?: string;
   post_comments?: PostComment[];
   isAdmin?: boolean;
-  onDeletePost: (deleted_post_id: number) => void;
 }
 
 export interface User {

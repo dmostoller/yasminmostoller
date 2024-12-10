@@ -3,6 +3,8 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { X } from 'lucide-react';
 import { Comment, User } from '@/lib/types';
+import { PrimaryButton } from './buttons/PrimaryButton';
+import { useComments } from '@/hooks/useComments';
 
 interface CommentFormProps {
   onAddComment: (comment: Comment) => void;
@@ -17,6 +19,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   onChangeIsComFormVis,
   user,
 }) => {
+  const { addComment } = useComments();
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
@@ -31,22 +34,15 @@ const CommentForm: React.FC<CommentFormProps> = ({
       user_id: user.id,
     },
     validationSchema: formSchema,
-    onSubmit: (values) => {
-      fetch('/comment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    onSubmit: values => {
+      addComment(values, {
+        onSuccess: newComment => {
+          onAddComment(newComment);
+          formik.resetForm();
         },
-        body: JSON.stringify(values),
-      }).then((res) => {
-        if (res.ok) {
-          res.json().then((newComment: Comment) => {
-            onAddComment(newComment);
-            formik.resetForm();
-          });
-        } else {
-          res.json().then((error) => setError(error.message));
-        }
+        onError: error => {
+          setError(error.message);
+        },
       });
     },
   });
@@ -56,7 +52,9 @@ const CommentForm: React.FC<CommentFormProps> = ({
       <form className="w-full" onSubmit={formik.handleSubmit}>
         <div className="mb-4">
           <div className="flex items-center justify-between">
-            <label className="block text-[var(--text-secondary)] text-sm font-medium mb-2">Add Comment</label>
+            <label className="block text-[var(--text-secondary)] text-sm font-medium mb-2">
+              Add Comment
+            </label>
             <button
               type="button"
               onClick={onChangeIsComFormVis}
@@ -79,12 +77,9 @@ const CommentForm: React.FC<CommentFormProps> = ({
           )}
         </div>
         <div className="mb-4">
-          <button
-            type="submit"
-            className="w-full bg-teal-500 text-white py-2 px-4 rounded-full hover:bg-teal-600 transition-colors duration-200"
-          >
+          <PrimaryButton type="submit" className="rounded-full w-full">
             Submit
-          </button>
+          </PrimaryButton>
         </div>
         {error && <div className="text-red-500 text-center">{error}</div>}
       </form>

@@ -19,28 +19,28 @@ export default function EditFolder({
   id,
   setFolderName,
   onToggleEdit,
-  onUpdateFolders
+  onUpdateFolders,
 }: EditFolderProps) {
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
-    name: yup.string().required('Please enter a folder name')
+    name: yup.string().required('Please enter a folder name'),
   });
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: name
+      name: name,
     },
     validationSchema: formSchema,
-    onSubmit: (values) => {
+    onSubmit: values => {
       fetch(`/api/folders/${id}`, {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values)
-      }).then((r) => {
+        body: JSON.stringify(values),
+      }).then(r => {
         if (r.ok) {
           r.json().then((updatedFolder: Folder) => {
             setFolderName(updatedFolder.name);
@@ -56,7 +56,7 @@ export default function EditFolder({
           // setLoading(false)
         }
       });
-    }
+    },
   });
 
   return (
@@ -67,22 +67,29 @@ export default function EditFolder({
           onChange={formik.handleChange}
           id="name"
           name="name"
-          className="w-full px-3 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm 
+          focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 
+          bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
         <div className="absolute right-0 flex space-x-1 mr-1">
           <button
             type="button"
             onClick={onToggleEdit}
-            className="p-1 text-teal-600 hover:text-teal-700 transition-colors"
+            className="p-1 text-teal-600 hover:text-teal-700 transition-colors bg-[var(--background-secondary)]"
           >
             <X size={16} />
           </button>
-          <button type="submit" className="p-1 text-teal-600 hover:text-teal-700 transition-colors">
+          <button
+            type="submit"
+            className="p-1 text-teal-600 hover:text-teal-700 transition-colors bg-[var(--background-secondary)]"
+          >
             <Check size={16} />
           </button>
         </div>
       </div>
-      {formik.errors.name && <p className="text-xs text-red-500 text-left mt-1">{formik.errors.name}</p>}
+      {formik.errors.name && (
+        <p className="text-xs text-red-500 text-left mt-1">{formik.errors.name}</p>
+      )}
       {error && <div className="text-xs text-red-500 mt-1">{error}</div>}
     </form>
   );

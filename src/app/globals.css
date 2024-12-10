@@ -5,8 +5,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --card-background: #ffffff;
+  --card-background: #ededed;
   --card-border: #e5e7eb;
+  --button-background: #d4d6da;
+  --button-border: #c4c4c4;
   --text-primary: #111827;
   --text-secondary: #4b5563;
   --gray-50: #f9fafb;
@@ -22,6 +24,8 @@
     --foreground: #ededed;
     --card-background: #1a1a1a;
     --card-border: #2d2d2d;
+    --button-background: #313336;
+    --button-border: #4f4f50;
     --text-primary: #f3f4f6;
     --text-secondary: #9ca3af;
     --gray-50: #1a1a1a;
@@ -29,6 +33,25 @@
     --toast-background: #1f2937;
     --toast-text: #f3f4f6;
     --toast-border: #374151;
+  }
+}
+
+@layer base {
+  /* Add gradient underline animation for links */
+  a:not([class]) {
+    @apply relative 
+           bg-gradient-to-r from-violet-600 via-blue-500 to-teal-400 
+           bg-clip-text text-transparent
+           transition-all duration-300;
+
+    /* Underline effect */
+    @apply after:content-['']
+           after:absolute after:bottom-0 after:left-0
+           after:w-full after:h-[1px]
+           after:bg-gradient-to-r after:from-violet-600 after:via-blue-500 after:to-teal-400
+           after:opacity-0 after:scale-x-0
+           after:transition-all after:duration-300
+           hover:after:opacity-100 hover:after:scale-x-100;
   }
 }
 

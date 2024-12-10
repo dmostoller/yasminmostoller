@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import * as yup from 'yup';
-import { Folder } from '@/lib/types';
 
 const folderSchema = yup.object().shape({
-  name: yup.string().required('Folder name is required')
+  name: yup.string().required('Folder name is required'),
 });
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -18,7 +17,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
     const folder = await prisma.folders.findUnique({
       where: { id },
-      include: { paintings: true }
+      include: { paintings: true },
     });
 
     if (!folder) {
@@ -47,7 +46,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     await folderSchema.validate(body);
 
     const existingFolder = await prisma.folders.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!existingFolder) {
@@ -57,8 +56,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     const updatedFolder = await prisma.folders.update({
       where: { id },
       data: {
-        name: body.name
-      }
+        name: body.name,
+      },
     });
 
     return NextResponse.json(updatedFolder);
@@ -83,7 +82,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
 
     const existingFolder = await prisma.folders.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!existingFolder) {
@@ -91,7 +90,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
 
     await prisma.folders.delete({
-      where: { id }
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Folder deleted successfully' }, { status: 200 });

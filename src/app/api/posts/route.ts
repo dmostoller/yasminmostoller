@@ -1,7 +1,6 @@
 // FILE: app/api/posts/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Post } from '@/lib/types';
 import * as yup from 'yup';
 import DOMPurify from 'dompurify';
 import { JSDOM } from 'jsdom';
@@ -10,7 +9,7 @@ const postSchema = yup.object().shape({
   title: yup.string().required(),
   content: yup.string().required(),
   image_url: yup.string().nullable(),
-  video_url: yup.string().nullable()
+  video_url: yup.string().nullable(),
 });
 
 const window = new JSDOM('').window;
@@ -22,13 +21,13 @@ export async function GET() {
       include: {
         post_comments: {
           include: {
-            users: true
-          }
-        }
+            users: true,
+          },
+        },
       },
       orderBy: {
-        date_added: 'desc'
-      }
+        date_added: 'desc',
+      },
     });
 
     return NextResponse.json(posts);
@@ -65,9 +64,9 @@ export async function POST(request: NextRequest) {
         'blockquote',
         'a',
         'img',
-        'span'
+        'span',
       ],
-      ALLOWED_ATTR: ['href', 'src', 'alt', 'style']
+      ALLOWED_ATTR: ['href', 'src', 'alt', 'style'],
     });
 
     // Create new post with current timestamp
@@ -77,8 +76,8 @@ export async function POST(request: NextRequest) {
         content: sanitizedContent,
         image_url: body.image_url || null,
         video_url: body.video_url || null,
-        date_added: new Date().toISOString()
-      }
+        date_added: new Date().toISOString(),
+      },
     });
 
     return NextResponse.json(post, { status: 201 });

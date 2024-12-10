@@ -7,6 +7,18 @@ import * as yup from 'yup';
 import { ArrowLeft } from 'lucide-react';
 import UploadWidget from '@/components/UploadWidget';
 import type { Folder, Painting } from '@/lib/types';
+import { CldImage } from 'next-cloudinary';
+import { useCreatePainting } from '@/hooks/usePaintings';
+interface PaintingFormValues {
+  title: string;
+  materials: string;
+  width: string; // string for form input
+  height: string; // string for form input
+  sale_price: string; // string for form input
+  image: string;
+  sold: string; // string for select input
+  folder_id: string; // string for select input
+}
 
 export default function NewPaintingPage() {
   const router = useRouter();
@@ -15,6 +27,7 @@ export default function NewPaintingPage() {
   const [folders, setFolders] = useState<Folder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [folderError, setFolderError] = useState<string | null>(null);
+  const createPainting = useCreatePainting();
 
   useEffect(() => {
     const getFolders = async () => {
@@ -27,7 +40,7 @@ export default function NewPaintingPage() {
           setFolderError('Failed to load folders');
         }
       } catch (err) {
-        setFolderError('Error loading folders');
+        setFolderError('Error loading folders' + err);
       } finally {
         setIsLoading(false);
       }
@@ -61,7 +74,7 @@ export default function NewPaintingPage() {
     folder_id: yup.number().required('Please select a value'),
   });
 
-  const formik = useFormik({
+  const formik = useFormik<PaintingFormValues>({
     enableReinitialize: true,
     initialValues: {
       title: '',
@@ -70,29 +83,26 @@ export default function NewPaintingPage() {
       height: '',
       sale_price: '',
       image: imageUrl,
-      sold: '',
+      sold: 'false',
       folder_id: '',
     },
     validationSchema: formSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       try {
-        const res = await fetch('/api/paintings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-
-        if (res.ok) {
-          const painting: Painting = await res.json();
-          router.push('/paintings');
-        } else {
-          const data = await res.json();
-          setError(data.message);
-        }
+        const paintingData: Omit<Painting, 'id'> = {
+          title: values.title,
+          materials: values.materials,
+          width: Number(values.width),
+          height: Number(values.height),
+          sale_price: Number(values.sale_price),
+          image: values.image,
+          sold: values.sold === 'true',
+          folder_id: Number(values.folder_id),
+        };
+        await createPainting.mutateAsync(paintingData);
+        router.push('/paintings');
       } catch (err) {
-        setError('An error occurred while submitting');
+        setError(err instanceof Error ? err.message : 'An error occurred');
       }
     },
   });
@@ -112,7 +122,10 @@ export default function NewPaintingPage() {
           <div className="space-y-2">
             <label className="flex items-center justify-between text-foreground">
               <span>Upload image then enter painting info...</span>
-              <Link href="/paintings" className="flex items-center text-blue-600 hover:text-blue-800">
+              <Link
+                href="/paintings"
+                className="flex items-center text-blue-600 hover:text-blue-800"
+              >
                 <ArrowLeft className="mr-1 h-4 w-4" />
                 Back to Paintings Page
               </Link>
@@ -120,7 +133,15 @@ export default function NewPaintingPage() {
 
             <UploadWidget onSetImageUrl={setImageUrl} />
 
-            {imageUrl && <img src={imageUrl} alt="Uploaded painting" className="mx-auto mt-2 rounded-md" />}
+            {imageUrl && (
+              <CldImage
+                src={imageUrl}
+                width={800}
+                height={600}
+                alt="Uploaded painting"
+                className="mx-auto mt-2 rounded-md"
+              />
+            )}
 
             <input
               type="text"
@@ -129,7 +150,9 @@ export default function NewPaintingPage() {
               value={formik.values.image}
               onChange={formik.handleChange}
             />
-            {formik.errors.image && <p className="text-center text-red-500">{formik.errors.image}</p>}
+            {formik.errors.image && (
+              <p className="text-center text-red-500">{formik.errors.image}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -142,7 +165,9 @@ export default function NewPaintingPage() {
               onChange={formik.handleChange}
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
-            {formik.errors.title && <p className="text-center text-red-500">{formik.errors.title}</p>}
+            {formik.errors.title && (
+              <p className="text-center text-red-500">{formik.errors.title}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -155,7 +180,9 @@ export default function NewPaintingPage() {
               onChange={formik.handleChange}
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
-            {formik.errors.materials && <p className="text-center text-red-500">{formik.errors.materials}</p>}
+            {formik.errors.materials && (
+              <p className="text-center text-red-500">{formik.errors.materials}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -168,7 +195,9 @@ export default function NewPaintingPage() {
               onChange={formik.handleChange}
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
-            {formik.errors.width && <p className="text-center text-red-500">{formik.errors.width}</p>}
+            {formik.errors.width && (
+              <p className="text-center text-red-500">{formik.errors.width}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -181,7 +210,9 @@ export default function NewPaintingPage() {
               onChange={formik.handleChange}
               className="w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
             />
-            {formik.errors.height && <p className="text-center text-red-500">{formik.errors.height}</p>}
+            {formik.errors.height && (
+              <p className="text-center text-red-500">{formik.errors.height}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -222,10 +253,15 @@ export default function NewPaintingPage() {
             >
               {folderList}
             </select>
-            {formik.errors.folder_id && <p className="text-center text-red-500">{formik.errors.folder_id}</p>}
+            {formik.errors.folder_id && (
+              <p className="text-center text-red-500">{formik.errors.folder_id}</p>
+            )}
           </div>
 
-          <button type="submit" className="w-full rounded-full bg-teal-500 py-2 text-white hover:bg-teal-600">
+          <button
+            type="submit"
+            className="w-full rounded-full bg-teal-500 py-2 text-white hover:bg-teal-600"
+          >
             Submit
           </button>
         </form>

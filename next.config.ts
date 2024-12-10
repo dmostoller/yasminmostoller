@@ -2,8 +2,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['res.cloudinary.com'],
-    // Optional: Add image optimization settings
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
+    ],
     minimumCacheTTL: 60,
     formats: ['image/webp'],
   },

@@ -1,11 +1,30 @@
 import { FC, useEffect, useRef } from 'react';
 import '../../node_modules/cloudinary-video-player/dist/cld-video-player.min.css';
-import { Cloudinary } from 'cloudinary-video-player';
 
-// Update global interface
+// Remove the conflicting import
+// import { Cloudinary } from 'cloudinary-video-player';
+
+type CloudinaryVideoPlayer = {
+  source: (url: string) => void;
+  dispose: () => void;
+};
+
+type CloudinaryVideoPlayerOptions = {
+  cloud_name: string;
+  controls: boolean;
+  fluid: boolean;
+};
+
+// Update global interface with a namespace
 declare global {
   interface Window {
-    cloudinary: Cloudinary;
+    // Use a namespace to avoid conflicts
+    cloudinary: {
+      createVideoPlayer(
+        element: HTMLVideoElement,
+        options: CloudinaryVideoPlayerOptions
+      ): CloudinaryVideoPlayer;
+    };
   }
 }
 
@@ -15,24 +34,22 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, cloudName = 'ddp2xfpyb' }) => {
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<CloudinaryVideoPlayer | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    // Load Cloudinary script dynamically
+    if (!videoRef.current) return;
+
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/cloudinary-video-player@1.9.0/dist/cld-video-player.min.js';
     script.async = true;
 
     script.onload = () => {
-      if (!videoRef.current) return;
-
       try {
-        // Initialize player after script loads
-        const cld = (window.cloudinary as any).videoPlayer(videoRef.current, {
+        const cld = window.cloudinary.createVideoPlayer(videoRef.current as HTMLVideoElement, {
           cloud_name: cloudName,
           controls: true,
-          fluid: true
+          fluid: true,
         });
 
         playerRef.current = cld;
@@ -45,7 +62,6 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, cloudName = 'ddp2xfpyb' }
     document.body.appendChild(script);
 
     return () => {
-      // Cleanup
       if (playerRef.current) {
         try {
           playerRef.current.dispose();

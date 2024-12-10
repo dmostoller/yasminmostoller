@@ -4,14 +4,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useState } from 'react';
-import { X as CloseIcon, LogIn, LogOut, User } from 'lucide-react';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { LogIn, LogOut, User } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 import { MenuIcon } from './icons/Menu';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
+import { SecondaryButton } from './buttons/SecondaryButton';
 
 const Nav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   const handleSignOut = async () => {
     await signOut({
@@ -26,7 +28,7 @@ const Nav = () => {
 
   const NavItem = ({ href, children }: { href: string; children: React.ReactNode }) => {
     const pathname = usePathname();
-    const isActive = pathname === href;
+    const isActive = href === '/' ? pathname === '/' : pathname?.startsWith(href || '');
 
     return (
       <Link
@@ -69,18 +71,27 @@ const Nav = () => {
       return <div className="animate-pulse w-20 h-8 bg-[var(--gray-100)] rounded" />;
     }
 
+    const handleAuthClick = (action: () => void) => {
+      action();
+      setIsMenuOpen(false);
+    };
+
     if (status === 'authenticated' && session.user) {
       return (
         <>
-          {/* <span className="text-[var(--text-secondary)] mr-4">Hi, {session.user.name}</span> */}
-          <SecondaryIconButton onClick={handleSignOut} icon={LogOut} />
-          <SecondaryIconButton href="/user" icon={User} />
+          <SecondaryIconButton onClick={() => handleAuthClick(handleSignOut)} icon={LogOut} />
+          <SecondaryIconButton href="/user" icon={User} onClick={() => setIsMenuOpen(false)} />
         </>
       );
     }
     return (
       <>
-        <SecondaryIconButton onClick={() => signIn('google')} icon={LogIn} />
+        <SecondaryButton
+          href="/api/auth/signin"
+          icon={LogIn}
+          text="Sign In"
+          onClick={() => setIsMenuOpen(false)}
+        />
       </>
     );
   };
@@ -91,7 +102,13 @@ const Nav = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 cursor-pointer">
-            <Image src="/images/y1.png" alt="logo" width={60} height={60} className="object-contain" />
+            <Image
+              src="/images/y1.png"
+              alt="logo"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
           </Link>
 
           {/* Mobile Menu Button */}
@@ -121,24 +138,24 @@ const Nav = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden bg-black bg-opacity-50">
-            <div className="h-full flex flex-col items-center justify-center space-y-6 bg-[var(--background)]">
-              {[
-                { href: '/gallery', text: 'Gallery' },
-                { href: '/paintings', text: 'Paintings' },
-                { href: '/events', text: 'Exhibitions' },
-                { href: '/news', text: 'News' },
-                { href: '/about', text: 'Bio' },
-                { href: '/contact', text: 'Contact' },
-              ].map(({ href, text }) => {
-                const pathname = usePathname();
-                const isActive = pathname === href;
+            <div className="h-full flex flex-col bg-[var(--background)]">
+              <div className="flex-1 flex flex-col items-center justify-center space-y-6">
+                {[
+                  { href: '/gallery', text: 'Gallery' },
+                  { href: '/paintings', text: 'Paintings' },
+                  { href: '/events', text: 'Exhibitions' },
+                  { href: '/news', text: 'News' },
+                  { href: '/about', text: 'Bio' },
+                  { href: '/contact', text: 'Contact' },
+                ].map(({ href, text }) => {
+                  const isActive = pathname === href;
 
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`
                       relative w-full text-center px-4 py-4 text-2xl font-medium
                       transition-all duration-300 ease-in-out
                       
@@ -164,11 +181,13 @@ const Nav = () => {
                       // Subtle glow effect
                       hover:shadow-[0_0_15px_-3px_rgba(139,92,246,0.1)]
                     `}
-                  >
-                    {text}
-                  </Link>
-                );
-              })}
+                    >
+                      {text}
+                    </Link>
+                  );
+                })}
+                <div className="p-6 flex space-x-2 justify-center">{renderAuthButtons()}</div>
+              </div>
             </div>
           </div>
         )}

@@ -1,6 +1,3 @@
-// components/Event.tsx
-import { useState } from 'react';
-import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Event } from '@/lib/types';
@@ -18,7 +15,6 @@ export default function Event({
   venue,
   location,
   details,
-  image_url,
   event_date,
   isAdmin,
   event_link,
@@ -30,9 +26,6 @@ export default function Event({
     e.preventDefault();
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
-        await fetch(`/api/events/${id}`, {
-          method: 'DELETE',
-        });
         onDeleteEvent(id);
       } catch (error) {
         console.error('Failed to delete event:', error);
@@ -49,6 +42,11 @@ export default function Event({
 
           <p className="font-bold text-[var(--text-primary)] mb-2">{venue}</p>
           <p className="font-bold text-[var(--text-primary)] mb-4">{location}</p>
+          <p className="text-sm text-[var(--text-secondary)] mb-4">
+            <a href={event_link} target="_blank" rel="noopener noreferrer">
+              {event_link}
+            </a>
+          </p>
           <div className="mt-4 text-[var(--text-secondary)]">
             <FormattedContent content={details || ''} />
           </div>

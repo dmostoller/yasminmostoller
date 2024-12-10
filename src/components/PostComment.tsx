@@ -1,7 +1,7 @@
-// PostComment.tsx
-import React, { useState } from 'react';
+'use client';
 import { Trash2 } from 'lucide-react';
-import { User, PostComment as PostCommentType } from '@/lib/types';
+import { User } from '@/lib/types';
+import { usePostComments } from '@/hooks/usePostComments';
 
 interface PostCommentProps {
   username: string;
@@ -20,33 +20,15 @@ const PostComment: React.FC<PostCommentProps> = ({
   date_added,
   comment_user_id,
   user,
-  onDeleteComment,
 }) => {
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
-
+  const { deletePostComment } = usePostComments();
   const handleDeleteComment = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
-    try {
-      setIsDeleting(true);
-      const response = await fetch(`/api/post_comments/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        onDeleteComment(id);
-      } else {
-        throw new Error('Failed to delete comment');
-      }
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-    } finally {
-      setIsDeleting(false);
-    }
+    deletePostComment(id);
   };
 
   return (
-    <div className="mb-4 rounded-lg bg-[var(--background-secondary)] p-4 shadow border border-[var(--text-secondary)]">
+    <div className="mb-4 rounded-lg bg-[var(--background-secondary)] p-4 shadow border border-[var(--card-border)] mt-2">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -56,7 +38,6 @@ const PostComment: React.FC<PostCommentProps> = ({
           {user && user.id === comment_user_id && (
             <button
               onClick={handleDeleteComment}
-              disabled={isDeleting}
               className="rounded-full p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--background-primary)] hover:text-red-500 disabled:opacity-50"
               aria-label="Delete comment"
             >

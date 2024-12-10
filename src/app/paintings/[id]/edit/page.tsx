@@ -8,54 +8,31 @@ import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 import UploadWidget from '@/components/UploadWidget';
 import type { Painting, Folder } from '@/lib/types';
+import { useFolders } from '@/hooks/useFolders';
+import { useUpdatePainting, useGetPainting } from '@/hooks/usePaintings';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function EditPaintingPage({ params }: { params: Promise<{ id: number }> }) {
   const unwrappedParams = React.use(params);
   const id = unwrappedParams.id;
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [painting, setPainting] = useState<Painting>({} as Painting);
+  const { data: painting, isError: paintingError } = useGetPainting(id);
   const [imageUrl, setImageUrl] = useState('');
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [folderError, setFolderError] = useState<string | null>(null);
+  const { data: folders, isLoading, isError: foldersError } = useFolders();
+  const updatePaintingMutation = useUpdatePainting();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    const getFolders = async () => {
-      try {
-        const res = await fetch('/api/folders');
-        if (res.ok) {
-          const data = await res.json();
-          setFolders(data);
-        } else {
-          setFolderError('Failed to load folders');
-        }
-      } catch (err) {
-        setFolderError('Error loading folders');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    if (painting?.image) {
+      setImageUrl(painting.image);
+    }
+  }, [painting?.image]);
 
-    getFolders();
-  }, []);
-
-  const folderList = folders.map((folder: Folder) => (
+  const folderList = folders?.map((folder: Folder) => (
     <option key={folder.id} value={folder.id}>
       {folder.name}
     </option>
   ));
-
-  useEffect(() => {
-    if (id) {
-      fetch(`/api/paintings/${id}`)
-        .then((res) => res.json())
-        .then((painting: Painting) => {
-          setPainting(painting);
-          setImageUrl(painting.image || '');
-        });
-    }
-  }, [id]);
 
   const formSchema = yup.object().shape({
     title: yup.string().required('Please enter a title'),
@@ -64,13 +41,13 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
       .number()
       .integer()
       .required('Please enter a width')
-      .min(0, 'Width cannot be a negative number'),
+      .min(0, 'Width cannot be negative'),
     height: yup
       .number()
       .integer()
       .required('Please enter a height')
-      .min(0, 'Height cannot be a negative number'),
-    sale_price: yup.string().required('Please enter an price'),
+      .min(0, 'Height cannot be negative'),
+    sale_price: yup.string().required('Please enter a price'),
     image: yup.string().required('Please enter an image link'),
     sold: yup.string().required('Please select a value'),
     folder_id: yup.number().required('Please select a value'),
@@ -79,45 +56,43 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      title: painting.title || '',
-      materials: painting.materials || '',
-      width: painting.width || '',
-      height: painting.height || '',
-      sale_price: painting.sale_price || '',
+      title: painting?.title || '',
+      materials: painting?.materials || '',
+      width: painting?.width || '',
+      height: painting?.height || '',
+      sale_price: painting?.sale_price || '',
       image: imageUrl,
-      sold: painting.sold ? 'true' : 'false',
-      folder_id: painting.folder_id || '',
+      sold: painting?.sold ? 'true' : 'false',
+      folder_id: painting?.folder_id || '',
     },
     validationSchema: formSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       try {
-        const res = await fetch(`/api/paintings/${id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
-
-        if (res.ok) {
-          const painting = await res.json();
-          router.push(`/paintings/${id}`);
-        } else {
-          const error = await res.json();
-          setError(error.message);
-        }
-      } catch (err) {
-        setError('An error occurred while updating the painting');
+        const updatedPainting = await updatePaintingMutation.mutateAsync({
+          id,
+          ...values,
+          image: imageUrl,
+          sold: values.sold === 'true',
+        } as Painting);
+        console.log('Updated painting:', updatedPainting);
+        // Wait for mutation to complete and cache to update
+        await queryClient.invalidateQueries({ queryKey: ['paintings', id] });
+        router.push(`/paintings/${id}`);
+      } catch (error) {
+        console.error('Failed to update painting:', error);
       }
     },
   });
 
   if (isLoading) return <div className="text-center">Loading folders...</div>;
-  if (folderError) return <div className="text-center text-red-500">{folderError}</div>;
+  if (paintingError || foldersError)
+    return <div className="text-center text-red-500">Error loading data</div>;
 
   return (
     <>
-      {error && <h2 className="text-center text-red-500">{error}</h2>}
+      {updatePaintingMutation.isError && (
+        <h2 className="text-center text-red-500">{updatePaintingMutation.error.message}</h2>
+      )}
       <div className="container mx-auto min-h-screen max-w-2xl px-4 mt-16 mb-6">
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
           <div className="flex items-center justify-center border-b border-border pb-4">
@@ -127,7 +102,10 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
           <div className="space-y-2">
             <label className="flex items-center justify-between text-foreground">
               <span>Upload image, then enter painting info...</span>
-              <Link href={`/paintings/${id}`} className="flex items-center text-blue-600 hover:text-blue-800">
+              <Link
+                href={`/paintings/${id}`}
+                className="flex items-center text-blue-600 hover:text-blue-800"
+              >
                 <ArrowLeft className="mr-1 h-4 w-4" />
                 Back to Painting
               </Link>
@@ -137,12 +115,24 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
 
             {imageUrl && (
               <div className="relative h-64 w-full">
-                <Image src={imageUrl} alt="Painting preview" fill className="rounded-md object-contain" />
+                <Image
+                  src={imageUrl}
+                  alt="Painting preview"
+                  fill
+                  className="rounded-md object-contain"
+                />
               </div>
             )}
 
-            <input type="hidden" name="image" value={formik.values.image} onChange={formik.handleChange} />
-            {formik.errors.image && <p className="text-center text-red-500">{formik.errors.image}</p>}
+            <input
+              type="hidden"
+              name="image"
+              value={formik.values.image}
+              onChange={formik.handleChange}
+            />
+            {formik.errors.image && (
+              <p className="text-center text-red-500">{formik.errors.image}</p>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -156,7 +146,9 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                 placeholder="Title..."
                 className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               />
-              {formik.errors.title && <p className="text-center text-red-500">{formik.errors.title}</p>}
+              {formik.errors.title && (
+                <p className="text-center text-red-500">{formik.errors.title}</p>
+              )}
             </div>
 
             <div>
@@ -185,7 +177,9 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                   placeholder="Width in inches..."
                   className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
                 />
-                {formik.errors.width && <p className="text-center text-red-500">{formik.errors.width}</p>}
+                {formik.errors.width && (
+                  <p className="text-center text-red-500">{formik.errors.width}</p>
+                )}
               </div>
 
               <div>
@@ -198,7 +192,9 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                   placeholder="Height in inches..."
                   className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
                 />
-                {formik.errors.height && <p className="text-center text-red-500">{formik.errors.height}</p>}
+                {formik.errors.height && (
+                  <p className="text-center text-red-500">{formik.errors.height}</p>
+                )}
               </div>
             </div>
 
@@ -227,7 +223,9 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                 <option value="false">For Sale</option>
                 <option value="true">Sold</option>
               </select>
-              {formik.errors.sold && <p className="text-center text-red-500">{formik.errors.sold}</p>}
+              {formik.errors.sold && (
+                <p className="text-center text-red-500">{formik.errors.sold}</p>
+              )}
             </div>
 
             <div>

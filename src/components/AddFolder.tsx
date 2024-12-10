@@ -3,6 +3,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useState } from 'react';
 import { Folder } from '@/lib/types';
+import { PrimaryButton } from '@/components/buttons/PrimaryButton';
 
 interface AddFolderProps {
   onToggleFolder: () => void;
@@ -13,23 +14,23 @@ export default function AddFolder({ onToggleFolder, onAddFolder }: AddFolderProp
   const [error, setError] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
-    name: yup.string().required('Please enter a group name')
+    name: yup.string().required('Please enter a group name'),
   });
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: ''
+      name: '',
     },
     validationSchema: formSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       try {
         const response = await fetch('/api/folders', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(values)
+          body: JSON.stringify(values),
         });
 
         if (response.ok) {
@@ -42,9 +43,9 @@ export default function AddFolder({ onToggleFolder, onAddFolder }: AddFolderProp
           setError(errorData.message);
         }
       } catch (err) {
-        setError('An error occurred while creating the folder');
+        setError('An error occurred while creating the folder' + err);
       }
-    }
+    },
   });
 
   return (
@@ -57,23 +58,25 @@ export default function AddFolder({ onToggleFolder, onAddFolder }: AddFolderProp
             onChange={formik.handleChange}
             id="name"
             name="name"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 pr-20 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="w-80 pl-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm 
+              focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 
+              bg-[var(--background-secondary)] text-[var(--text-primary)]"
           />
-          <div className="absolute right-0 flex space-x-2 pr-2">
+          <div className="absolute right-0 flex space-x-2">
             <button
               type="button"
               onClick={onToggleFolder}
-              className="rounded p-2 text-teal-600 hover:bg-teal-50"
+              className="pl-1 text-teal-600 hover:text-teal-700 transition-colors bg-[var(--background-secondary)]"
             >
               <X className="h-5 w-5" />
             </button>
-            <button type="submit" className="rounded bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">
-              Submit
-            </button>
+            <PrimaryButton type="submit" text="Submit" className="rounded-md" />
           </div>
         </div>
       </div>
-      {formik.errors.name && <p className="mt-2 text-left text-sm text-red-600">{formik.errors.name}</p>}
+      {formik.errors.name && (
+        <p className="mt-2 text-left text-sm text-[var(--text-primary)]">{formik.errors.name}</p>
+      )}
       {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
     </form>
   );

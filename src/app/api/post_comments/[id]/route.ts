@@ -1,10 +1,10 @@
-// app/api/post_comments/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request) {
   try {
-    const id = parseInt(params.id);
+    const url = new URL(request.url);
+    const id = parseInt(url.pathname.split('/').pop() || '');
 
     if (!id || isNaN(id)) {
       return NextResponse.json({ error: 'Invalid comment ID' }, { status: 400 });

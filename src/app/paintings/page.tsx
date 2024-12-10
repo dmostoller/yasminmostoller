@@ -38,7 +38,7 @@ export default function PaintingsPage() {
     );
   }
 
-  const results = paintings.filter((painting: Painting) => {
+  const results = (paintings ?? []).filter((painting: Painting) => {
     return painting.title.toLowerCase().includes(searchQ.toLowerCase());
   });
 
@@ -59,9 +59,13 @@ export default function PaintingsPage() {
       (a.width ?? 0) * (a.height ?? 0) > (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
     );
   } else if (sortBy === 'Low') {
-    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1));
+    searchResults.sort((a: Painting, b: Painting) =>
+      (a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1
+    );
   } else if (sortBy === 'High') {
-    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1));
+    searchResults.sort((a: Painting, b: Painting) =>
+      (a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1
+    );
   }
 
   const folderResults = searchResults.filter((painting: Painting) => {
@@ -107,7 +111,18 @@ export default function PaintingsPage() {
         />
         {session?.user && isAdmin && (
           <div className="grid place-items-center pt-5">
-            <PrimaryButton text="Add Painting" href="/paintings/new" icon={Plus} className="rounded-full" />
+            <PrimaryButton
+              href="/paintings/new"
+              icon={Plus}
+              hoverText="Add Painting"
+              className="w-60 rounded-full"
+              showTextOnHover
+            >
+              <span className="block group-hover:hidden">
+                <Plus className="h-6 w-6" />
+              </span>
+              <span className="hidden group-hover:block">Add Painting</span>
+            </PrimaryButton>
           </div>
         )}
       </div>
@@ -118,7 +133,7 @@ export default function PaintingsPage() {
           {/* Pagination Controls */}
           <div className="flex justify-center gap-2 mt-8">
             <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
                          px-4 py-2 text-white rounded
@@ -132,7 +147,7 @@ export default function PaintingsPage() {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
                          px-4 py-2 text-white rounded

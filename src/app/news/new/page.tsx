@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
-import { Post } from '@/lib/types';
+// import { Post } from '@/lib/types';
 import UploadWidget from '@/components/UploadWidget';
 import UploadVideoWidget from '@/components/UploadVideoWidget';
 import VideoPlayer from '@/components/VideoPlayer';
@@ -20,7 +20,10 @@ const NewPostPage = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const formSchema = yup.object().shape({
-    title: yup.string().required('Please enter a title').min(2, 'name must be more than two characters long'),
+    title: yup
+      .string()
+      .required('Please enter a title')
+      .min(2, 'name must be more than two characters long'),
     content: yup.string().required('Please enter content for your post'),
   });
 
@@ -33,7 +36,7 @@ const NewPostPage = () => {
       video_url: videoUrl ?? '',
     },
     validationSchema: formSchema,
-    onSubmit: async (values) => {
+    onSubmit: async values => {
       try {
         const res = await fetch('/api/posts', {
           method: 'POST',
@@ -44,14 +47,14 @@ const NewPostPage = () => {
         });
 
         if (res.ok) {
-          const post: Post = await res.json();
+          // const post: Post = await res.json();
           router.push('/news');
         } else {
           const errorData = await res.json();
           setError(errorData.message);
         }
       } catch (err) {
-        setError('An error occurred while creating the post');
+        setError('An error occurred while creating the post' + err);
       }
     },
   });
@@ -161,20 +164,22 @@ const NewPostPage = () => {
                   'bold italic forecolor | alignleft aligncenter ' +
                   'alignright alignjustify | bullist numlist outdent indent | ' +
                   'removeformat | help',
-                setup: (editor) => {
+                setup: editor => {
                   const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   editor.options.set('skin', isDarkMode ? 'oxide-dark' : 'oxide');
                   editor.options.set('content_css', isDarkMode ? 'dark' : 'default');
 
                   // Listen for system theme changes
-                  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                    editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
-                    editor.options.set('content_css', e.matches ? 'dark' : 'default');
-                  });
+                  window
+                    .matchMedia('(prefers-color-scheme: dark)')
+                    .addEventListener('change', e => {
+                      editor.options.set('skin', e.matches ? 'oxide-dark' : 'oxide');
+                      editor.options.set('content_css', e.matches ? 'dark' : 'default');
+                    });
                 },
               }}
               value={formik.values.content}
-              onEditorChange={(content) => {
+              onEditorChange={content => {
                 formik.setFieldValue('content', content);
               }}
             />

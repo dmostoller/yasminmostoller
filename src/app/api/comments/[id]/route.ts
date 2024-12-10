@@ -1,26 +1,52 @@
-// app/api/comment/[id]/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request) {
   try {
-    const id = parseInt(params.id);
+    const url = new URL(request.url);
+    const id = parseInt(url.pathname.split('/').pop() || '');
 
     if (!id || isNaN(id)) {
       return NextResponse.json({ error: 'Invalid comment ID' }, { status: 400 });
+    }
+
+    const comment = await prisma.comments.findUnique({
+      where: { id },
+    });
+
+    if (!comment) {
+      return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
     }
 
     const deletedComment = await prisma.comments.delete({
       where: { id },
     });
 
-    if (!deletedComment) {
-      return NextResponse.json({ error: 'Comment not found' }, { status: 404 });
+    return NextResponse.json(
+      {
+        message: 'Comment deleted successfully',
+        data: deletedComment || null,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        {
+          error: 'Database operation failed',
+          details: error.message,
+        },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json(deletedComment, { status: 200 });
-  } catch (error) {
-    console.error('Error deleting comment:', error);
-    return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to delete comment',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }

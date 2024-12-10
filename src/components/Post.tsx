@@ -1,6 +1,5 @@
 // Post.tsx
 import { FC } from 'react';
-import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { Post as PostType } from '@/lib/types';
 import FormattedContent from '@/components/FormattedContent';
@@ -10,7 +9,7 @@ import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
 import { SecondaryButton } from './buttons/SecondaryButton';
 
-const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_added, isAdmin }) => {
+const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_added }) => {
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-[var(--card-border)] bg-[var(--background-secondary)] shadow-sm transition-all duration-200 hover:shadow-lg">
       {/* Media Section */}
@@ -26,11 +25,14 @@ const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_add
         </div>
       )}
 
-      {video_url !== 'undefined' && video_url !== undefined && video_url !== null && video_url !== 'null' && (
-        <div>
-          <CldVideoPlayer width="1080" height="1920" src={video_url} />
-        </div>
-      )}
+      {video_url !== 'undefined' &&
+        video_url !== undefined &&
+        video_url !== null &&
+        video_url !== 'null' && (
+          <div>
+            <CldVideoPlayer width="1080" height="1920" src={video_url} />
+          </div>
+        )}
 
       {/* Content Section */}
       <div className="flex flex-col flex-grow p-6">

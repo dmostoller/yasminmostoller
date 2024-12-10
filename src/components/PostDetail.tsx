@@ -2,19 +2,18 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Undo, Edit, Trash2 } from 'lucide-react';
+import { Undo2, Edit, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import PostCommentsList from '@/components/PostCommentList';
-import VideoPlayer from '@/components/VideoPlayer';
 import { Post } from '@/lib/types';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import FormattedContent from '@/components/FormattedContent';
 import DateFormat from '@/components/DateFormat';
 import { CldImage } from 'next-cloudinary';
 import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
+import { SecondaryIconButton } from './buttons/SecondaryIconButton';
+import { usePosts } from '@/hooks/usePosts';
 
 interface PostDetailProps {
   post: Post;
@@ -22,24 +21,14 @@ interface PostDetailProps {
 
 export default function PostDetail({ post }: PostDetailProps) {
   const { data: session } = useSession();
-  const isAdmin = true; // TODO: Replace with actual admin check
+  const isAdmin = session?.user?.is_admin;
   const router = useRouter();
-  const [modalOpen, setModalOpen] = useState(false);
   const [videoUrl] = useState<string | null>(post.video_url ?? null);
+  const { deletePost } = usePosts();
 
-  function handleOpen() {
-    setModalOpen(true);
-  }
-
-  function handleClose() {
-    setModalOpen(false);
-  }
-
-  const handleDeletePost = async (e: React.MouseEvent) => {
+  const handleDeletePost = async () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
-      await fetch(`/api/posts/${post.id}`, {
-        method: 'DELETE',
-      });
+      await deletePost.mutateAsync(post.id.toString());
       router.push('/news');
     }
   };
@@ -50,19 +39,19 @@ export default function PostDetail({ post }: PostDetailProps) {
         <div className="md:flex">
           {/* Left column - Media */}
           <div className="md:w-3/4">
-            {post.image_url !== 'undefined' && post.image_url !== null && post.image_url !== 'null' && (
-              <div>
-                <CldImage
-                  width="960"
-                  height="600"
-                  onClick={handleOpen}
-                  src={post.image_url || ''}
-                  alt={post.title || 'Post image'}
-                  sizes="100vw"
-                  className="cursor-pointer"
-                />
-              </div>
-            )}
+            {post.image_url !== 'undefined' &&
+              post.image_url !== null &&
+              post.image_url !== 'null' && (
+                <div>
+                  <CldImage
+                    width="960"
+                    height="600"
+                    src={post.image_url || ''}
+                    alt={post.title || 'Post image'}
+                    sizes="100vw"
+                  />
+                </div>
+              )}
             {videoUrl !== 'undefined' &&
               videoUrl !== null &&
               videoUrl !== '' &&
@@ -84,7 +73,7 @@ export default function PostDetail({ post }: PostDetailProps) {
               <FormattedContent content={post.content || ''} />
             </div>
             <div className="flex gap-2 pt-4">
-              <PrimaryIconButton href="/news" icon={Undo} />
+              <SecondaryIconButton href="/news" icon={Undo2} />
               {session?.user && isAdmin && (
                 <>
                   <PrimaryIconButton href={`/news/${post.id}/edit`} icon={Edit} />
