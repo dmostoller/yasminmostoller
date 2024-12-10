@@ -2,7 +2,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Undo2, Edit, Trash2 } from 'lucide-react';
+import { Undo2, Edit, Trash2, Facebook } from 'lucide-react';
+import { Bluesky } from './icons/Bluesky';
 import { useSession } from 'next-auth/react';
 import PostCommentsList from '@/components/PostCommentList';
 import FormattedContent from '@/components/FormattedContent';
@@ -39,6 +40,29 @@ export default function PostDetail({ postId }: PostDetailProps) {
       }
       router.push('/news');
     }
+  };
+
+  const handleFacebookShare = () => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app';
+    const shareUrl = `${baseUrl}/news/${postId}`;
+
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      'facebook-share-dialog',
+      'width=800,height=600'
+    );
+  };
+
+  const handleBlueSkyShare = () => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app';
+    const shareUrl = `${baseUrl}/news/${postId}`;
+    const text = `Check out "${post?.title}"\n\n${shareUrl}`;
+
+    window.open(
+      `https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`,
+      'bluesky-share-dialog',
+      'width=800,height=600'
+    );
   };
 
   return (
@@ -80,6 +104,8 @@ export default function PostDetail({ postId }: PostDetailProps) {
             </div>
             <div className="flex gap-2 pt-4">
               <SecondaryIconButton href="/news" icon={Undo2} />
+              <SecondaryIconButton onClick={handleFacebookShare} icon={Facebook} label="Share on Facebook" />
+              <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
               {session?.user && isAdmin && (
                 <>
                   <PrimaryIconButton href={`/news/${post.id}/edit`} icon={Edit} />

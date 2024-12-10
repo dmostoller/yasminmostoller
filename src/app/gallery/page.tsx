@@ -5,17 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { DollarSign } from 'lucide-react';
-import type { Swiper as SwiperType } from 'swiper';
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import { usePaintings } from '@/hooks/usePaintings';
 import { Painting } from '@/lib/types';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 // Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
-import 'swiper/css/thumbs';
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -27,7 +24,6 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 const Gallery: React.FC = () => {
-  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const { data: paintings, isLoading, error } = usePaintings();
 
   const [shuffledPaintings] = useState<Painting[]>(() => {
@@ -57,7 +53,7 @@ const Gallery: React.FC = () => {
           alt={painting.title}
           src={painting.image || ''}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 1200px"
-          unoptimized // Add this if image URLs are from external source
+          unoptimized
         />
       </div>
       <div className="py-4 md:py-6 px-3 md:px-4 space-y-2">
@@ -70,10 +66,7 @@ const Gallery: React.FC = () => {
           {painting.sold ? (
             <span className="text-red-500 font-medium">SOLD</span>
           ) : (
-            <Link
-              href="/contact"
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
-            >
+            <Link href="/contact" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
               <DollarSign className="w-4 h-4 md:w-5 md:h-5" />
               <span className="text-base md:text-lg">{painting.sale_price}</span>
             </Link>
@@ -83,47 +76,18 @@ const Gallery: React.FC = () => {
     </SwiperSlide>
   ));
 
-  const thumbGallery = shuffledPaintings.map((painting: Painting) => (
-    <SwiperSlide key={painting.id}>
-      <div className="relative w-full aspect-square">
-        <Image
-          fill
-          className="object-cover rounded cursor-pointer"
-          alt={painting.title}
-          src={painting.image || ''}
-          sizes="(max-width: 250px) 100vw, 250px"
-          unoptimized // Add this if image URLs are from external source
-        />
-      </div>
-    </SwiperSlide>
-  ));
-
   return (
-    <main className="container mx-auto mt-12 min-h-screen max-w-3xl px-4">
+    <main className="container mx-auto mt-6 min-h-screen max-w-3xl px-4">
       <div className="h-[900px] w-full max-w-[1200px] mx-auto">
         <Swiper
           loop={true}
           autoHeight={true}
           spaceBetween={100}
           navigation={true}
-          thumbs={{ swiper: thumbsSwiper }}
-          modules={[FreeMode, Navigation, Thumbs]}
+          modules={[Navigation]}
           className="mb-2"
         >
           {gallery}
-        </Swiper>
-
-        <Swiper
-          onSwiper={setThumbsSwiper}
-          loop={true}
-          spaceBetween={10}
-          slidesPerView={4}
-          freeMode={true}
-          watchSlidesProgress={true}
-          modules={[FreeMode, Navigation, Thumbs]}
-          className="thumb-swiper"
-        >
-          {thumbGallery}
         </Swiper>
       </div>
     </main>

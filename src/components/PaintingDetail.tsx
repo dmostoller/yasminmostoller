@@ -12,12 +12,13 @@ import PaintingModal from '@/components/PaintingModal';
 import type { User } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 import { PrimaryButton } from './buttons/PrimaryButton';
-import { Edit, Trash2, Download, MessageSquare } from 'lucide-react';
+import { Edit, Trash2, Download, MessageSquare, Facebook } from 'lucide-react';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
 import { useDeletePainting, useGetPainting } from '@/hooks/usePaintings';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
+import { Bluesky } from './icons/Bluesky';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -25,6 +26,8 @@ interface PaintingDetailProps {
 interface Session {
   user: User | null;
 }
+
+import React from 'react';
 
 export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const router = useRouter();
@@ -69,13 +72,38 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       });
   };
 
+  const handleFacebookShare = () => {
+    // Construct the share URL - replace with your actual deployment URL
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app/';
+    const shareUrl = `${baseUrl}/paintings/${paintingId}`;
+
+    // Open Facebook share dialog
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      'facebook-share-dialog',
+      'width=800,height=600'
+    );
+  };
+
+  const handleBlueSkyShare = () => {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app';
+    const shareUrl = `${baseUrl}/paintings/${paintingId}`;
+    const text = `Check out "${painting?.title}" by Yasmin Mostoller\n\n${shareUrl}`;
+
+    window.open(
+      `https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`,
+      'bluesky-share-dialog',
+      'width=800,height=600'
+    );
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (isError || !painting) return <ErrorMessage message="Failed to load painting" />;
 
   return (
     <div className="flex justify-center w-full">
       <div className="container mx-auto max-w-6xl px-4">
-        <div className="mt-24 rounded-lg shadow-lg bg-[var(--background-secondary)]">
+        <div className="mt-12 rounded-lg shadow-lg bg-[var(--background-secondary)]">
           <div className="flex flex-col md:flex-row">
             <div className="relative w-full md:w-1/2">
               <CldImage
@@ -113,6 +141,12 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
 
               <div className="flex gap-2 mt-4">
                 <SecondaryIconButton href="/paintings" icon={Undo2} />
+                <SecondaryIconButton
+                  onClick={handleFacebookShare}
+                  icon={Facebook}
+                  label="Share on Facebook"
+                />
+                <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
                 {isAdmin && (
                   <>
                     <PrimaryIconButton href={`/paintings/${painting.id}/edit`} icon={Edit} />

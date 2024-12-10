@@ -13,10 +13,9 @@ const NewsPage = () => {
   const { data: posts, isLoading, error } = usePosts();
 
   const sortedPosts =
-    posts?.sort((a, b) => (a.date_added && b.date_added && a.date_added > b.date_added ? -1 : 1)) ??
-    [];
+    posts?.sort((a, b) => (a.date_added && b.date_added && a.date_added > b.date_added ? -1 : 1)) ?? [];
 
-  const blog = sortedPosts.map(post => (
+  const blog = sortedPosts.map((post) => (
     <Post
       key={post.id}
       id={post.id}

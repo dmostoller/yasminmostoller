@@ -20,8 +20,8 @@ export default function TermsPage() {
           <section>
             <h2 className="text-xl font-semibold mb-2">2. User Comments</h2>
             <p>
-              Users may post comments on blog posts after authentication through Google. You agree that your
-              comments will not contain harmful, offensive, or inappropriate content.
+              Users may post comments on blog posts and paintings after authentication through Google. You
+              agree that your comments will not contain harmful, offensive, or inappropriate content.
             </p>
           </section>
 

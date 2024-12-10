@@ -21,12 +21,7 @@ const ContactForm = () => {
       setIsLoading(true);
 
       try {
-        await emailjs.sendForm(
-          'service_jz3d31c',
-          'template_avspnq3',
-          form.current,
-          '2CBV5usGCJRMr4WbB'
-        );
+        await emailjs.sendForm('service_jz3d31c', 'template_avspnq3', form.current, '2CBV5usGCJRMr4WbB');
 
         alert('Your Message Has Been Sent');
         router.push('/');
@@ -77,12 +72,7 @@ const ContactForm = () => {
           className="w-full px-3 py-2 border border-[var(--text-secondary)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
       </div>
-      <PrimaryButton
-        type="submit"
-        disabled={isLoading}
-        className="w-full rounded-md"
-        isLoading={isLoading}
-      >
+      <PrimaryButton type="submit" disabled={isLoading} className="w-full rounded-full" isLoading={isLoading}>
         {isLoading ? (
           <>
             <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />

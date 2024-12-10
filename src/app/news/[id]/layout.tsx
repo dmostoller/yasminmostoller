@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { marked } from 'marked';
 
 async function getPost(id: string) {
   const baseUrl =
@@ -33,45 +34,32 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     openGraph: {
       title: `${post.title} | Yasmin Mostoller`,
       description: `${post.content.substring(0, 160)}...`,
+      type: 'website',
+      images: [
+        {
+          url: post.image_url || '',
+          width: 1200,
+          height: 630,
+          alt: `${post.title} - Yasmin Mostoller`,
+          type: 'image/jpeg',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${post.title} | Yasmin Mostoller`,
-      description: `${post.content.substring(0, 160)}...`,
+      description:
+        (await marked.parse(post.content))
+          .replace(/<[^>]*>/g, '') // Remove HTML tags
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .substring(0, 160) + '...',
       creator: '@YasminMostoller',
+      images: [post.image_url],
     },
     alternates: {
       canonical: `https://yasminmostoller.com/news/${resolvedParams.id}`,
     },
   };
-
-  // Add media-specific metadata
-  if (post.video_url) {
-    metadata.openGraph = {
-      ...metadata.openGraph,
-      type: 'video.other',
-      videos: [
-        {
-          url: post.video_url,
-          type: 'video/mp4',
-        },
-      ],
-    };
-  } else if (post.image_url) {
-    metadata.openGraph = {
-      ...metadata.openGraph,
-      type: 'article',
-      images: [
-        {
-          url: post.image_url,
-          width: 1200,
-          height: 630,
-          alt: `${post.title} | Yasmin Mostoller`,
-          type: 'image/jpeg',
-        },
-      ],
-    };
-  }
 
   return metadata;
 }

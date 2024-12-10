@@ -12,8 +12,7 @@ export default function EventsPage() {
   const isAdmin = session?.user?.is_admin ?? false;
   const { events, isLoading, error, deleteEvent } = useEvents();
 
-  const sortedEvents =
-    events?.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1)) ?? [];
+  const sortedEvents = events?.sort((a, b) => ((a.event_date ?? 0) > (b.event_date ?? 0) ? -1 : 1)) ?? [];
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -44,7 +43,7 @@ export default function EventsPage() {
 
   return (
     <div className=" container mx-auto min-h-screen bg-[var(--background-primary)]">
-      <div className="mt-12 mb-5 text-center container mx-auto px-2">
+      <div className="mt-8 mb-5 text-center container mx-auto px-2">
         {session?.user && isAdmin && (
           <PrimaryButton
             href="/events/new"
@@ -62,7 +61,7 @@ export default function EventsPage() {
 
         <div className="mt-2 text-left max-w-screen-xl mx-auto">
           <div className="grid grid-cols-1 gap-2">
-            {sortedEvents.map(event => (
+            {sortedEvents.map((event) => (
               <Event
                 key={event.id}
                 id={event.id}
