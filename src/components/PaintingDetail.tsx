@@ -1,5 +1,5 @@
 'use client';
-
+import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CldImage } from 'next-cloudinary';
@@ -12,13 +12,15 @@ import PaintingModal from '@/components/PaintingModal';
 import type { User } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 import { PrimaryButton } from './buttons/PrimaryButton';
-import { Edit, Trash2, Download, MessageSquare, Facebook } from 'lucide-react';
+import { Edit, Trash2, Download, MessageSquare, Facebook, Instagram } from 'lucide-react';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
 import { useDeletePainting, useGetPainting } from '@/hooks/usePaintings';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import { Bluesky } from './icons/Bluesky';
+import { Toaster } from 'react-hot-toast';
+import { FacebookShareButton } from 'react-share';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -29,6 +31,7 @@ interface Session {
 
 import React from 'react';
 import { SecondaryButton } from './buttons/SecondaryButton';
+import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 
 export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const router = useRouter();
@@ -73,26 +76,28 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       });
   };
 
-  const handleFacebookShare = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com/';
-    const shareUrl = `${baseUrl}/paintings/${paintingId}`;
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const isTablet = window.matchMedia('(min-width: 769px) and (max-width: 1024px)').matches;
+  // const handleFacebookShare = () => {
+  //   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com/';
+  //   const shareUrl = `${baseUrl}/paintings/${paintingId}`;
+  //   const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  //   const isTablet = window.matchMedia('(min-width: 769px) and (max-width: 1024px)').matches;
 
-    if (isMobile || isTablet) {
-      window.open(
-        `fb://share?url=${encodeURIComponent(shareUrl)}`,
-        'facebook-share-dialog',
-        'width=800,height=600'
-      );
-    } else {
-      window.open(
-        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-        'facebook-share-dialog',
-        'width=800,height=600'
-      );
-    }
-  };
+  //   if (isMobile || isTablet) {
+  //     window.open(
+  //       `fb://share?url=${encodeURIComponent(shareUrl)}`,
+  //       'facebook-share-dialog',
+  //       'width=800,height=600'
+  //     );
+  //   } else {
+  //     window.open(
+  //       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+  //       'facebook-share-dialog',
+  //       'width=800,height=600'
+  //     );
+  //   }
+  // };
+
+  const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com'}/paintings/${paintingId}`;
 
   const handleBlueSkyShare = () => {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com';
@@ -106,11 +111,54 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
     );
   };
 
+  const handleZapierWebhook = async () => {
+    if (!painting) {
+      console.error('Missing painting data');
+      return;
+    }
+
+    const originalUrl = painting.image;
+    const transformedImageUrl = originalUrl
+      ? originalUrl.replace('/upload/', '/upload/fl_attachment,f_jpg/') + '.jpg'
+      : '';
+
+    console.log('Original URL:', originalUrl);
+    console.log('Transformed URL:', transformedImageUrl);
+
+    const payload = {
+      caption:
+        `${painting.title} - ${painting.width || ''}" x ${painting.height}" - ${painting.materials || ''}`.trim(),
+      imageUrl: transformedImageUrl,
+      shareUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com'}/paintings/${paintingId}`,
+    };
+
+    try {
+      const response = await fetch('/api/share-painting', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to share painting');
+      }
+
+      toast.success('Successfully shared painting to Zapier');
+    } catch (error) {
+      console.error('Share failed:', error);
+      toast.error('Failed to share painting. Please try again.');
+    } finally {
+    }
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (isError || !painting) return <ErrorMessage message="Failed to load painting" />;
 
   return (
     <div className="flex justify-center w-full">
+      <Toaster position="top-center" />
       <div className="container mx-auto max-w-6xl px-4">
         <div className="mt-12 rounded-lg shadow-lg bg-[var(--background-secondary)]">
           <div className="flex flex-col md:flex-row">
@@ -154,10 +202,18 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
 
               <div className="flex gap-2 mt-4">
                 <SecondaryIconButton href="/paintings" icon={Undo2} />
-                <SecondaryIconButton
+                {/* <SecondaryIconButton
                   onClick={handleFacebookShare}
                   icon={Facebook}
                   label="Share on Facebook"
+                /> */}
+                <FacebookShareButton url={shareUrl} hashtag="#art">
+                  <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
+                </FacebookShareButton>
+                <SecondaryIconButton
+                  onClick={handleZapierWebhook}
+                  icon={Instagram}
+                  label="Share on Instagram"
                 />
                 <SecondaryIconButton
                   onClick={handleBlueSkyShare}
