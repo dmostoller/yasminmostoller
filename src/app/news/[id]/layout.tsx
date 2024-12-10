@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { marked } from 'marked';
 
 async function getPost(id: string) {
   const baseUrl =
@@ -26,7 +25,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const resolvedParams = await params;
   const post = await getPost(resolvedParams.id);
 
-  // Base metadata without media
   const metadata: Metadata = {
     title: `${post.title} | Yasmin Mostoller`,
     description: `${post.content.substring(0, 160)}... Read more news and updates from contemporary artist Yasmin Mostoller.`,
@@ -49,9 +47,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       card: 'summary_large_image',
       title: `${post.title} | Yasmin Mostoller`,
       description:
-        (await marked.parse(post.content))
-          .replace(/<[^>]*>/g, '') // Remove HTML tags
-          .replace(/\s+/g, ' ') // Normalize whitespace
+        post.content
+          .replace(/[#*_`]/g, '') // Remove markdown chars
+          .replace(/\n/g, ' ') // Replace newlines with spaces
+          .trim()
           .substring(0, 160) + '...',
       creator: '@YasminMostoller',
       images: [post.image_url],
