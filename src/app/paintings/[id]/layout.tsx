@@ -22,38 +22,40 @@ async function getPainting(id: string) {
   return res.json();
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
   const painting = await getPainting(resolvedParams.id);
 
   return {
-    title: painting.title,
-    description: `View ${painting.title} painting details`,
+    title: `${painting.title} | Original Art by Yasmin Mostoller`,
+    description: `${painting.title} (${painting.year}) - ${painting.medium}, ${painting.dimensions}. Original artwork by contemporary artist Yasmin Mostoller. View details, pricing, and availability.`,
+    keywords: `${painting.title}, Yasmin Mostoller, original art, contemporary painting, ${painting.medium}, fine art`,
     openGraph: {
-      title: painting.title,
-      description: `View ${painting.title} painting details`,
+      title: `${painting.title} | Original Art by Yasmin Mostoller`,
+      description: `${painting.title} (${painting.year}) - ${painting.medium}, ${painting.dimensions}. Original artwork by contemporary artist Yasmin Mostoller.`,
+      type: 'website',
       images: [
         {
           url: painting.image || '',
           width: 1200,
           height: 630,
-          alt: painting.title,
+          alt: `${painting.title} - Original artwork by Yasmin Mostoller`,
+          type: 'image/jpeg',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: painting.title,
-      description: `View ${painting.title} painting details`,
+      title: `${painting.title} | Yasmin Mostoller Art`,
+      description: `${painting.title} (${painting.year}) - ${painting.medium}, ${painting.dimensions}. Original contemporary artwork.`,
       images: [painting.image || ''],
+      creator: '@YasminMostoller',
+    },
+    alternates: {
+      canonical: `https://yasminmostoller.com/paintings/${painting.slug}`,
     },
   };
 }
-
 export default function Layout({ children }: { children: React.ReactNode }) {
   return children;
 }
