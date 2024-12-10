@@ -28,11 +28,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   return {
     title: `${painting.title} | Original Art by Yasmin Mostoller`,
-    description: `${painting.title} (${painting.year}) - ${painting.medium}, ${painting.dimensions}. Original artwork by contemporary artist Yasmin Mostoller. View details, pricing, and availability.`,
-    keywords: `${painting.title}, Yasmin Mostoller, original art, contemporary painting, ${painting.medium}, fine art`,
+    description: `${painting.title} - ${painting.materials}, ${painting.height}" x ${painting.width}". Original artwork by contemporary artist Yasmin Mostoller. View details, pricing, and availability.`,
+    keywords: `${painting.title}, Yasmin Mostoller, original art, contemporary painting, ${painting.materials}, fine art`,
     openGraph: {
       title: `${painting.title} | Original Art by Yasmin Mostoller`,
-      description: `${painting.title} (${painting.year}) - ${painting.medium}, ${painting.dimensions}. Original artwork by contemporary artist Yasmin Mostoller.`,
+      description: `${painting.title} - ${painting.materials}, ${painting.height}" x ${painting.width}". Original artwork by contemporary artist Yasmin Mostoller.`,
       type: 'website',
       images: [
         {
@@ -47,12 +47,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     twitter: {
       card: 'summary_large_image',
       title: `${painting.title} | Yasmin Mostoller Art`,
-      description: `${painting.title} (${painting.year}) - ${painting.medium}, ${painting.dimensions}. Original contemporary artwork.`,
+      description: `${painting.title} - ${painting.materials}, ${painting.height}" x ${painting.width}". Original contemporary artwork.`,
       images: [painting.image || ''],
       creator: '@YasminMostoller',
     },
     alternates: {
-      canonical: `https://yasminmostoller.com/paintings/${painting.slug}`,
+      canonical: `https://yasminmostoller.com/paintings/${resolvedParams.id}`,
     },
   };
 }
