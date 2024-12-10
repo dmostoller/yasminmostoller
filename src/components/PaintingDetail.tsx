@@ -65,29 +65,36 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       .get(url, {
         responseType: 'blob',
       })
-      .then((res) => {
+      .then(res => {
         fileDownload(res.data, filename);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Error downloading file:', error);
       });
   };
 
   const handleFacebookShare = () => {
-    // Construct the share URL - replace with your actual deployment URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app/';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com/';
     const shareUrl = `${baseUrl}/paintings/${paintingId}`;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    // Open Facebook share dialog
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-      'facebook-share-dialog',
-      'width=800,height=600'
-    );
+    if (isMobile) {
+      window.open(
+        `fb://facewebmodal/f?href=${encodeURIComponent(shareUrl)}`,
+        'facebook-share-dialog',
+        'width=800,height=600'
+      );
+    } else {
+      window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+        'facebook-share-dialog',
+        'width=800,height=600'
+      );
+    }
   };
 
   const handleBlueSkyShare = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com';
     const shareUrl = `${baseUrl}/paintings/${paintingId}`;
     const text = `Check out "${painting?.title}" by Yasmin Mostoller\n\n${shareUrl}`;
 
@@ -118,7 +125,11 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                 priority
               />
               {isModalOpen && painting.image && (
-                <PaintingModal imageUrl={painting.image} title={painting.title} onClose={handleCloseModal} />
+                <PaintingModal
+                  imageUrl={painting.image}
+                  title={painting.title}
+                  onClose={handleCloseModal}
+                />
               )}
             </div>
 
@@ -147,7 +158,11 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                   icon={Facebook}
                   label="Share on Facebook"
                 />
-                <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
+                <SecondaryIconButton
+                  onClick={handleBlueSkyShare}
+                  icon={Bluesky}
+                  label="Share on BlueSky"
+                />
                 {isAdmin && (
                   <>
                     <PrimaryIconButton href={`/paintings/${painting.id}/edit`} icon={Edit} />
@@ -162,7 +177,10 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                     text="Download"
                     className="rounded-full"
                     onClick={() =>
-                      handleDownload(painting.image || '/path/to/default/image.jpg', `${painting.title}.jpg`)
+                      handleDownload(
+                        painting.image || '/path/to/default/image.jpg',
+                        `${painting.title}.jpg`
+                      )
                     }
                   />
                 )}
