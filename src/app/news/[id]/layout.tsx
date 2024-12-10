@@ -33,8 +33,6 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     openGraph: {
       title: `${post.title} | Yasmin Mostoller`,
       description: `${post.content.substring(0, 160)}...`,
-      type: 'article',
-      authors: ['Yasmin Mostoller'],
     },
     twitter: {
       card: 'summary_large_image',
@@ -59,25 +57,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         },
       ],
     };
-    metadata.twitter = {
-      ...metadata.twitter,
-    };
   } else if (post.image_url) {
     metadata.openGraph = {
       ...metadata.openGraph,
+      type: 'article',
       images: [
         {
           url: post.image_url,
           width: 1200,
           height: 630,
-          alt: post.title,
+          alt: `${post.title} | Yasmin Mostoller`,
           type: 'image/jpeg',
         },
       ],
-    };
-    metadata.twitter = {
-      ...metadata.twitter,
-      images: [post.image_url],
     };
   }
 
