@@ -76,11 +76,12 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const handleFacebookShare = () => {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com/';
     const shareUrl = `${baseUrl}/paintings/${paintingId}`;
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const isTablet = window.matchMedia('(min-width: 769px) and (max-width: 1024px)').matches;
 
-    if (isMobile) {
+    if (isMobile || isTablet) {
       window.open(
-        `fb://facewebmodal/f?href=${encodeURIComponent(shareUrl)}`,
+        `fb://share?url=${encodeURIComponent(shareUrl)}`,
         'facebook-share-dialog',
         'width=800,height=600'
       );
