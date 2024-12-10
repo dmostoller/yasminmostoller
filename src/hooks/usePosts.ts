@@ -36,3 +36,14 @@ export function usePosts() {
     deletePost,
   };
 }
+
+export function useGetPost(id: number) {
+  return useQuery({
+    queryKey: ['posts', id],
+    queryFn: async () => {
+      const res = await fetch(`/api/posts/${id}`);
+      if (!res.ok) throw new Error('Failed to fetch post');
+      return res.json() as Promise<Post>;
+    },
+  });
+}

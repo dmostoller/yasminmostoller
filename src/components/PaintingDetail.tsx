@@ -1,4 +1,3 @@
-// app/paintings/[id]/PaintingDetail.tsx
 'use client';
 
 import { useState } from 'react';
@@ -62,10 +61,10 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       .get(url, {
         responseType: 'blob',
       })
-      .then(res => {
+      .then((res) => {
         fileDownload(res.data, filename);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error downloading file:', error);
       });
   };
@@ -90,11 +89,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                 priority
               />
               {isModalOpen && painting.image && (
-                <PaintingModal
-                  imageUrl={painting.image}
-                  title={painting.title}
-                  onClose={handleCloseModal}
-                />
+                <PaintingModal imageUrl={painting.image} title={painting.title} onClose={handleCloseModal} />
               )}
             </div>
 
@@ -132,10 +127,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                     text="Download"
                     className="rounded-full"
                     onClick={() =>
-                      handleDownload(
-                        painting.image || '/path/to/default/image.jpg',
-                        `${painting.title}.jpg`
-                      )
+                      handleDownload(painting.image || '/path/to/default/image.jpg', `${painting.title}.jpg`)
                     }
                   />
                 )}

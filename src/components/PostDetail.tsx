@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Undo2, Edit, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import PostCommentsList from '@/components/PostCommentList';
-import { Post } from '@/lib/types';
 import FormattedContent from '@/components/FormattedContent';
 import DateFormat from '@/components/DateFormat';
 import { CldImage } from 'next-cloudinary';
@@ -13,22 +12,31 @@ import { CldVideoPlayer } from 'next-cloudinary';
 import 'next-cloudinary/dist/cld-video-player.css';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
-import { usePosts } from '@/hooks/usePosts';
+import { usePosts, useGetPost } from '@/hooks/usePosts';
+import LoadingSpinner from '@/components/LoadingSpinner';
+import ErrorMessage from '@/components/ErrorMessage';
 
 interface PostDetailProps {
-  post: Post;
+  postId: number;
 }
 
-export default function PostDetail({ post }: PostDetailProps) {
+export default function PostDetail({ postId }: PostDetailProps) {
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin;
   const router = useRouter();
-  const [videoUrl] = useState<string | null>(post.video_url ?? null);
+  const { data: post, isLoading, error } = useGetPost(postId);
+  const [videoUrl] = useState<string | null>(post?.video_url ?? null);
   const { deletePost } = usePosts();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message="Failed to load post" />;
+  if (!post) return <div>Post not found</div>;
 
   const handleDeletePost = async () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
-      await deletePost.mutateAsync(post.id.toString());
+      if (post) {
+        await deletePost.mutateAsync(post.id.toString());
+      }
       router.push('/news');
     }
   };
@@ -39,19 +47,17 @@ export default function PostDetail({ post }: PostDetailProps) {
         <div className="md:flex">
           {/* Left column - Media */}
           <div className="md:w-3/4">
-            {post.image_url !== 'undefined' &&
-              post.image_url !== null &&
-              post.image_url !== 'null' && (
-                <div>
-                  <CldImage
-                    width="960"
-                    height="600"
-                    src={post.image_url || ''}
-                    alt={post.title || 'Post image'}
-                    sizes="100vw"
-                  />
-                </div>
-              )}
+            {post.image_url !== 'undefined' && post.image_url !== null && post.image_url !== 'null' && (
+              <div>
+                <CldImage
+                  width="960"
+                  height="600"
+                  src={post.image_url || ''}
+                  alt={post.title || 'Post image'}
+                  sizes="100vw"
+                />
+              </div>
+            )}
             {videoUrl !== 'undefined' &&
               videoUrl !== null &&
               videoUrl !== '' &&
