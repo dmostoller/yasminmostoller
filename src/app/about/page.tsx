@@ -26,7 +26,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-[90vh] flex items-center justify-center p-4 bg-[var(--background-primary)]">
       <div className="w-full max-w-screen-2xl mx-auto bg-[var(--background-secondary)] rounded-lg shadow-lg overflow-hidden">
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="relative w-full md:w-3/4 aspect-[4/3]">
             <Image
               className="object-cover rounded-lg"
@@ -63,7 +63,7 @@ export default function AboutPage() {
                 <Link
                   href="https://www.facebook.com/yasminmostollerart"
                   target="_blank"
-                  className="p-3 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                  className="p-3 rounded-full bg-gradient-to-tr from-blue-800 via-blue-500 to-blue-400 hover:from-blue-950 hover:via-blue-600 hover:to-blue-500 text-white transition-all duration-300"
                 >
                   <Facebook />
                 </Link>
@@ -76,7 +76,7 @@ export default function AboutPage() {
                 <Link
                   href="https://www.instagram.com/yasminnunsy/"
                   target="_blank"
-                  className="p-3 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+                  className="p-3 rounded-full bg-gradient-to-tr from-purple-800 via-purple-500 to-purple-400 hover:from-purple-950 hover:via-purple-600 hover:to-purple-500 text-white transition-all duration-300"
                 >
                   <Instagram />
                 </Link>
