@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -26,12 +26,16 @@ function shuffleArray<T>(array: T[]): T[] {
 const Gallery: React.FC = () => {
   const { data: paintings, isLoading, error } = usePaintings();
 
-  const [shuffledPaintings] = useState<Painting[]>(() => {
+  const shuffledPaintings = useMemo(() => {
     return paintings ? shuffleArray(paintings) : [];
-  });
+  }, [paintings]);
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="container mx-auto mt-6 min-h-screen max-w-3xl px-4">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (error) {
@@ -42,7 +46,13 @@ const Gallery: React.FC = () => {
     );
   }
 
-  if (!paintings) return null;
+  if (!paintings || paintings.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[90vh]">
+        <p className="text-xl">No paintings available</p>
+      </div>
+    );
+  }
 
   const gallery = shuffledPaintings.map((painting: Painting) => (
     <SwiperSlide key={painting.id}>
