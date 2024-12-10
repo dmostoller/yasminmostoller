@@ -28,6 +28,7 @@ interface Session {
 }
 
 import React from 'react';
+import { SecondaryButton } from './buttons/SecondaryButton';
 
 export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const router = useRouter();
@@ -154,7 +155,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                   </>
                 )}
               </div>
-              <div className="mt-16">
+              <div className="mt-4">
                 {isAdmin && (
                   <PrimaryButton
                     icon={Download}
@@ -166,7 +167,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                   />
                 )}
                 {!painting.sold && !isAdmin && (
-                  <PrimaryButton
+                  <SecondaryButton
                     text="Purchase Inquiry"
                     href="/contact"
                     className="rounded-full"
