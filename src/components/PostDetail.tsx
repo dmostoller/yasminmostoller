@@ -1,6 +1,5 @@
 // components/PostDetail.tsx
 'use client';
-import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Undo2, Edit, Trash2, Facebook } from 'lucide-react';
 import { Bluesky } from './icons/Bluesky';
@@ -16,17 +15,35 @@ import { SecondaryIconButton } from './buttons/SecondaryIconButton';
 import { usePosts, useGetPost } from '@/hooks/usePosts';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
+import { Toaster } from 'react-hot-toast';
+import { FacebookShareButton } from 'react-share';
+import { StoryShare } from './ShareStory';
+import { ShareCarousel } from './ShareCarousel';
+import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 
 interface PostDetailProps {
   postId: number;
 }
+
+const stripHtmlAndMarkdown = (html: string) => {
+  // First remove HTML tags
+  let text = html.replace(/<[^>]*>/g, '');
+  // Remove Markdown headers, bold, italic, links etc
+  text = text.replace(/[#*_\[\]()]/g, '');
+  // Remove &nbsp; entities
+  text = text.replace(/&nbsp;/g, ' ');
+  // Remove extra whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  return text;
+};
 
 export default function PostDetail({ postId }: PostDetailProps) {
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin;
   const router = useRouter();
   const { data: post, isLoading, error } = useGetPost(postId);
-  const [videoUrl] = useState<string | null>(post?.video_url ?? null);
+
+  const videoUrl = post?.video_url;
   const { deletePost } = usePosts();
 
   if (isLoading) return <LoadingSpinner />;
@@ -42,16 +59,7 @@ export default function PostDetail({ postId }: PostDetailProps) {
     }
   };
 
-  const handleFacebookShare = () => {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app';
-    const shareUrl = `${baseUrl}/news/${postId}`;
-
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-      'facebook-share-dialog',
-      'width=800,height=600'
-    );
-  };
+  const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com'}/news/${postId}`;
 
   const handleBlueSkyShare = () => {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://yasminmostoller.vercel.app';
@@ -67,6 +75,7 @@ export default function PostDetail({ postId }: PostDetailProps) {
 
   return (
     <div className="container mx-auto min-h-screen px-4 mt-12">
+      <Toaster position="top-center" />
       <div className="mx-auto max-w-7xl overflow-hidden rounded-lg bg-[var(--background-secondary)] border border-[var(--card-border)] shadow-md">
         <div className="md:flex">
           {/* Left column - Media */}
@@ -82,15 +91,22 @@ export default function PostDetail({ postId }: PostDetailProps) {
                 />
               </div>
             )}
-            {videoUrl !== 'undefined' &&
-              videoUrl !== null &&
-              videoUrl !== '' &&
-              videoUrl !== 'null' &&
-              videoUrl !== undefined && (
-                <div>
-                  <CldVideoPlayer width="1080" height="1920" src={videoUrl} />
-                </div>
-              )}
+            {videoUrl && videoUrl !== 'undefined' && videoUrl !== 'null' && (
+              <div className="video-player-wrapper">
+                <CldVideoPlayer
+                  width="1080"
+                  height="1920"
+                  src={videoUrl}
+                  colors={{
+                    accent: '#ff0000',
+                    base: '#000000',
+                  }}
+                  onError={(error: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+                    console.error('Video player error:', error);
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Right column - Content */}
@@ -104,10 +120,25 @@ export default function PostDetail({ postId }: PostDetailProps) {
             </div>
             <div className="flex gap-2 pt-4">
               <SecondaryIconButton href="/news" icon={Undo2} />
-              <SecondaryIconButton onClick={handleFacebookShare} icon={Facebook} label="Share on Facebook" />
+              <FacebookShareButton url={shareUrl} hashtag="#art">
+                <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
+              </FacebookShareButton>
               <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
+
               {session?.user && isAdmin && (
                 <>
+                  {post.image_url &&
+                    post.image_url !== 'undefined' &&
+                    post.image_url !== 'null' &&
+                    (!videoUrl || videoUrl === 'undefined' || videoUrl === 'null' || videoUrl === '') && (
+                      <>
+                        <StoryShare imageUrl={post.image_url} caption={`${post.title} - ${post.content}`} />
+                        <ShareCarousel
+                          imageUrl={post.image_url}
+                          caption={`${post.title} - ${stripHtmlAndMarkdown(post.content || '')}`}
+                        />
+                      </>
+                    )}
                   <PrimaryIconButton href={`/news/${post.id}/edit`} icon={Edit} />
                   <PrimaryIconButton onClick={handleDeletePost} icon={Trash2} />
                 </>

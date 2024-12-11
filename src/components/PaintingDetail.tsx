@@ -22,6 +22,9 @@ import { Toaster } from 'react-hot-toast';
 import { FacebookShareButton } from 'react-share';
 import { StoryShare } from './ShareStory';
 import { ShareCarousel } from './ShareCarousel';
+import React from 'react';
+import { SecondaryButton } from './buttons/SecondaryButton';
+import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -29,10 +32,6 @@ interface PaintingDetailProps {
 interface Session {
   user: User | null;
 }
-
-import React from 'react';
-import { SecondaryButton } from './buttons/SecondaryButton';
-import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 
 export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const router = useRouter();
@@ -69,10 +68,10 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       .get(url, {
         responseType: 'blob',
       })
-      .then(res => {
+      .then((res) => {
         fileDownload(res.data, filename);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error downloading file:', error);
       });
   };
@@ -143,12 +142,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                 <FacebookShareButton url={shareUrl} hashtag="#art">
                   <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
                 </FacebookShareButton>
-
-                <SecondaryIconButton
-                  onClick={handleBlueSkyShare}
-                  icon={Bluesky}
-                  label="Share on BlueSky"
-                />
+                <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
                 {isAdmin && (
                   <>
                     <StoryShare
@@ -171,10 +165,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                     text="Download"
                     className="rounded-full"
                     onClick={() =>
-                      handleDownload(
-                        painting.image || '/path/to/default/image.jpg',
-                        `${painting.title}.jpg`
-                      )
+                      handleDownload(painting.image || '/path/to/default/image.jpg', `${painting.title}.jpg`)
                     }
                   />
                 )}

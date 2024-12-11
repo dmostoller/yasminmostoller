@@ -179,7 +179,7 @@ export class InstagramAuth {
     }
   }
 
-  static async createMediaContainer(accessToken: string, mediaUrl: string, mediaType: 'IMAGE') {
+  static async createMediaContainer(accessToken: string, mediaUrl: string, mediaType: 'IMAGE' | 'REELS') {
     try {
       // Get user ID first
       const userResponse = await axios.get(`${this.GRAPH_URL}/me`, {
@@ -195,8 +195,9 @@ export class InstagramAuth {
       const response = await axios.post(
         `${this.GRAPH_URL}/${userId}/media`,
         {
-          image_url: mediaUrl,
+          [mediaType === 'IMAGE' ? 'image_url' : 'video_url']: mediaUrl,
           media_type: mediaType,
+          sharing_type: mediaType === 'REELS' ? 'REELS' : undefined,
         },
         {
           params: { access_token: accessToken },

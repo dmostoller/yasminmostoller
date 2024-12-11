@@ -20,7 +20,7 @@ interface InstagramError extends Error {
 const DEFAULT_CAROUSEL_IMAGE =
   'https://res.cloudinary.com/ddp2xfpyb/image/upload/v1733873685/carousel-default_ku5b4m.png';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function POST(request: Request) {
   try {
@@ -40,8 +40,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid request parameters' }, { status: 400 });
     }
 
-    const finalMediaUrls =
-      mediaUrls.length === 1 ? [...mediaUrls, DEFAULT_CAROUSEL_IMAGE] : mediaUrls;
+    const finalMediaUrls = mediaUrls.length === 1 ? [...mediaUrls, DEFAULT_CAROUSEL_IMAGE] : mediaUrls;
 
     try {
       const containerIds = [];
@@ -96,8 +95,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Instagram API error',
-          details:
-            (error as InstagramError).response?.data?.error?.message || (error as Error).message,
+          details: (error as InstagramError).response?.data?.error?.message || (error as Error).message,
           status: (error as InstagramError).response?.status || 500,
         },
         {
