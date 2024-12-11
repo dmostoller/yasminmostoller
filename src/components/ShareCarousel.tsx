@@ -68,6 +68,7 @@ export function ShareCarousel({ imageUrl, caption }: ShareCarouselProps) {
       onClick={shareToCarousel}
       icon={Image}
       disabled={isSharing}
+      isLoading={isSharing}
       label={isSharing ? 'Sharing...' : 'Share to Instagram Feed'}
     />
   );

@@ -20,7 +20,7 @@ interface InstagramError extends Error {
 const DEFAULT_CAROUSEL_IMAGE =
   'https://res.cloudinary.com/ddp2xfpyb/image/upload/v1733873685/carousel-default_ku5b4m.png';
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function POST(request: Request) {
   try {
@@ -51,13 +51,13 @@ export async function POST(request: Request) {
       for (const url of finalMediaUrls) {
         const container = await InstagramAuth.createMediaContainer(accessToken, url, 'IMAGE');
         containerIds.push(container.id);
-        await delay(1000); // 1 second delay between requests
+        await delay(500); // 1 second delay between requests
       }
 
       console.log('Created containers:', containerIds);
 
       // Step 2: Wait before creating carousel
-      await delay(2000);
+      await delay(500);
 
       // Step 3: Create carousel with container IDs
       const result = await InstagramAuth.shareCarousel(accessToken, containerIds, caption);

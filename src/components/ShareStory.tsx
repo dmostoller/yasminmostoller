@@ -85,6 +85,7 @@ export function StoryShare({ imageUrl, caption }: ShareStoryProps) {
       onClick={shareToStory}
       icon={Instagram}
       disabled={isSharing}
+      isLoading={isSharing}
       label={isSharing ? 'Sharing...' : 'Share to Instagram Story'}
     />
   );

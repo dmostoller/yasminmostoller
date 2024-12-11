@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes, FC } from 'react';
 import Link from 'next/link';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, Loader } from 'lucide-react';
 import { useState } from 'react';
 import { Popover, PopoverPosition } from '@/components/Popover';
 
@@ -35,7 +35,7 @@ export const PrimaryIconButton: FC<PrimaryIconButtonProps> = ({
 
   const ButtonContent = (
     <div className="relative">
-      <Icon className="h-6 w-6" />
+      {isLoading ? <Loader className="h-6 w-6 animate-spin" /> : <Icon className="h-6 w-6" />}
       {showLabel && label && <Popover label={label} position={popoverPosition} />}
     </div>
   );
