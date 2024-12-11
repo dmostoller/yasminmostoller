@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useCallback, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import PaintingsList from '@/components/PaintingsList';
 import PaintingSkeleton from '@/components/PaintingSkeleton';
@@ -7,11 +7,13 @@ import Search from '@/components/Search';
 import { useSession } from 'next-auth/react';
 import { usePaintings } from '@/hooks/usePaintings';
 import { useFolders } from '@/hooks/useFolders';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import type { Painting } from '@/lib/types';
 import { PrimaryButton } from '@/components/buttons/PrimaryButton';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-const ITEMS_PER_PAGE = 6;
+// const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_BATCH = 6;
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -27,12 +29,26 @@ export default function PaintingsPage() {
   const isAdmin = session?.user?.is_admin ?? false;
   const { data: paintings, isLoading: paintingsLoading, error: paintingsError } = usePaintings();
   const { data: folders, isLoading: foldersLoading } = useFolders();
-
+  const [shuffledPaintings, setShuffledPaintings] = useState<Painting[]>([]);
   const [selectedFolder, setSelectedFolder] = useState('none');
   const [searchQ, setSearchQ] = useState('');
   const [sortBy, setSortBy] = useState('Default');
   const [forSale, setForSale] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [displayedItems, setDisplayedItems] = useState(ITEMS_PER_BATCH);
+
+  const loadMore = useCallback(() => {
+    setDisplayedItems((prev) => prev + ITEMS_PER_BATCH);
+    setIsFetching(false);
+  }, []);
+
+  const { isFetching, setIsFetching, lastElementRef } = useInfiniteScroll(loadMore);
+
+  useEffect(() => {
+    if (paintings && !shuffledPaintings.length) {
+      const shuffled = shuffleArray(paintings);
+      setShuffledPaintings(shuffled);
+    }
+  }, [paintings, shuffledPaintings.length]);
 
   if (paintingsLoading || foldersLoading) {
     return <LoadingSpinner />;
@@ -47,9 +63,11 @@ export default function PaintingsPage() {
     );
   }
 
-  const results = (paintings ?? []).filter((painting: Painting) => {
-    return painting.title.toLowerCase().includes(searchQ.toLowerCase());
-  });
+  const results = (shuffledPaintings.length ? shuffledPaintings : (paintings ?? [])).filter(
+    (painting: Painting) => {
+      return painting.title.toLowerCase().includes(searchQ.toLowerCase());
+    }
+  );
 
   let searchResults = results.filter((painting: Painting) => {
     if (forSale === true) {
@@ -60,7 +78,7 @@ export default function PaintingsPage() {
   });
 
   if (sortBy === 'Default') {
-    searchResults = shuffleArray(searchResults);
+    searchResults = [...searchResults];
   } else if (sortBy === 'Small') {
     searchResults.sort((a: Painting, b: Painting) =>
       (a.width ?? 0) * (a.height ?? 0) < (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
@@ -82,21 +100,16 @@ export default function PaintingsPage() {
     return painting.folder_id === Number(selectedFolder);
   });
 
-  // Pagination logic
-  const totalPages = Math.ceil(folderResults.length / ITEMS_PER_PAGE);
-  const paginatedResults = folderResults.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
   const handleSortBy = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
 
   const handleSelectedFolder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedFolder(e.target.value);
-    setCurrentPage(1);
   };
+
+  const paginatedResults = folderResults.slice(0, displayedItems);
+  const hasMore = displayedItems < folderResults.length;
 
   return (
     <div className="container mx-auto min-h-screen px-4 mb-8">
@@ -130,38 +143,15 @@ export default function PaintingsPage() {
         )}
       </div>
       <Suspense fallback={<PaintingSkeleton />}>
-        <div className="container mx-auto pt-6">
-          <PaintingsList paintings={paginatedResults} />
-
-          {/* Pagination Controls */}
-          <div className="flex justify-center gap-2 mt-8">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
-                         px-4 py-2 text-white rounded
-                         hover:from-violet-700 hover:via-blue-600 hover:to-teal-500 
-                         disabled:opacity-50 disabled:cursor-not-allowed
-                         transition-all shadow-sm"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
-                         px-4 py-2 text-white rounded
-                         hover:from-violet-700 hover:via-blue-600 hover:to-teal-500 
-                         disabled:opacity-50 disabled:cursor-not-allowed
-                         transition-all shadow-sm"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        <PaintingsList paintings={paginatedResults} lastElementRef={lastElementRef} />
+        {isFetching && hasMore && (
+          <Suspense fallback={<PaintingSkeleton />}>
+            <PaintingsList
+              paintings={paginatedResults.slice(displayedItems - ITEMS_PER_BATCH)}
+              lastElementRef={lastElementRef}
+            />
+          </Suspense>
+        )}
       </Suspense>
     </div>
   );

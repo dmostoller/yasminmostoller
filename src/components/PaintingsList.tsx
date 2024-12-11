@@ -1,4 +1,3 @@
-// PaintingsList.tsx
 'use client';
 
 import React from 'react';
@@ -7,29 +6,29 @@ import { Painting as PaintingType } from '@/lib/types';
 
 interface PaintingsListProps {
   paintings: PaintingType[];
+  lastElementRef?: (node: HTMLElement | null) => void;
 }
 
-function PaintingsList({ paintings }: PaintingsListProps) {
-  const gallery = paintings.map((painting) => {
-    return (
-      <Painting
-        key={painting.id}
-        id={painting.id}
-        image={painting.image}
-        title={painting.title}
-        sale_price={painting.sale_price}
-        height={painting.height}
-        width={painting.width}
-        materials={painting.materials}
-        sold={painting.sold}
-        folder_id={painting.folder_id}
-      />
-    );
-  });
-
+function PaintingsList({ paintings, lastElementRef }: PaintingsListProps) {
   return (
     <div className="container mx-auto">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">{gallery}</div>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+        {paintings.map((painting, index) => (
+          <div key={painting.id} ref={index === paintings.length - 1 ? lastElementRef : undefined}>
+            <Painting
+              id={painting.id}
+              image={painting.image}
+              title={painting.title}
+              sale_price={painting.sale_price}
+              height={painting.height}
+              width={painting.width}
+              materials={painting.materials}
+              sold={painting.sold}
+              folder_id={painting.folder_id}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
