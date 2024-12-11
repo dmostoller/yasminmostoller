@@ -42,15 +42,16 @@ export function ShareCarousel({ imageUrl, caption }: ShareCarouselProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mediaUrls: [imageUrl], // Single image carousel for now
+          mediaUrls: [imageUrl],
           caption,
           accessToken: freshToken,
         }),
       });
 
+      const responseData = await shareResponse.json();
+
       if (!shareResponse.ok) {
-        const errorData = await shareResponse.json();
-        throw new Error(errorData.error || 'Failed to share to feed');
+        throw new Error(responseData.error || `Failed to share (${shareResponse.status})`);
       }
 
       toast.success('Successfully shared to Instagram Feed');

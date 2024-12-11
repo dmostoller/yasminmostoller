@@ -12,8 +12,18 @@ const nextConfig = {
     minimumCacheTTL: 60,
     formats: ['image/webp'],
   },
-  // Optional: Add Swiper optimization
   transpilePackages: ['swiper'],
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Connection', value: 'keep-alive' },
+          { key: 'Keep-Alive', value: 'timeout=60' },
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
