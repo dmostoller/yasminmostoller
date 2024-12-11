@@ -20,77 +20,111 @@ interface InstagramError extends Error {
 const DEFAULT_CAROUSEL_IMAGE =
   'https://res.cloudinary.com/ddp2xfpyb/image/upload/v1733873685/carousel-default_ku5b4m.png';
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function POST(request: Request) {
   try {
+    // Add request timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
+
     const { mediaUrls, caption, accessToken } = await request.json();
 
     console.log('Starting carousel creation:', {
       urlCount: mediaUrls?.length,
       captionLength: caption?.length,
+      timestamp: new Date().toISOString(),
     });
 
-    if (!mediaUrls || !Array.isArray(mediaUrls) || mediaUrls.length === 0) {
-      return NextResponse.json({ error: 'Media URLs array is required' }, { status: 400 });
+    if (!mediaUrls?.length || !accessToken) {
+      return NextResponse.json({ error: 'Invalid request parameters' }, { status: 400 });
     }
 
-    if (!accessToken) {
-      return NextResponse.json({ error: 'Access token is required' }, { status: 400 });
-    }
-
-    let finalMediaUrls = mediaUrls;
-    if (mediaUrls.length === 1) {
-      finalMediaUrls = [...mediaUrls, DEFAULT_CAROUSEL_IMAGE];
-      console.log('Added default carousel image');
-    }
+    const finalMediaUrls =
+      mediaUrls.length === 1 ? [...mediaUrls, DEFAULT_CAROUSEL_IMAGE] : mediaUrls;
 
     try {
-      // Step 1: Create containers with delay between requests
       const containerIds = [];
       for (const url of finalMediaUrls) {
-        const container = await InstagramAuth.createMediaContainer(accessToken, url, 'IMAGE');
-        containerIds.push(container.id);
-        await delay(500); // 1 second delay between requests
+        try {
+          const container = await InstagramAuth.createMediaContainer(accessToken, url, 'IMAGE');
+
+          if (!container?.id) {
+            throw new Error('Failed to create media container');
+          }
+
+          containerIds.push(container.id);
+          await delay(1000); // Increase delay to 1s
+        } catch (containerError) {
+          console.error('Container creation failed:', containerError);
+          if (containerError instanceof Error) {
+            throw new Error(`Container creation failed: ${containerError.message}`);
+          } else {
+            throw new Error('Container creation failed: Unknown error');
+          }
+        }
       }
 
       console.log('Created containers:', containerIds);
 
-      // Step 2: Wait before creating carousel
-      await delay(500);
+      // Longer delay before carousel creation
+      await delay(2000);
 
-      // Step 3: Create carousel with container IDs
       const result = await InstagramAuth.shareCarousel(accessToken, containerIds, caption);
 
-      return NextResponse.json({ success: true, result });
-    } catch (error: unknown) {
-      // Type guard to check if error matches InstagramError structure
-      const isInstagramError = (err: unknown): err is InstagramError => {
-        return err instanceof Error && 'response' in err;
-      };
+      clearTimeout(timeoutId);
 
-      console.error('Instagram carousel sharing error:', error);
-
-      if (isInstagramError(error)) {
-        console.error('Detailed error:', {
-          message: error.message,
-          response: error.response?.data,
-        });
-
-        return NextResponse.json(
-          {
-            error: 'Failed to create carousel',
-            details: error.response?.data?.error?.message || error.message,
+      return NextResponse.json(
+        { success: true, result },
+        {
+          headers: {
+            'Content-Type': 'application/json',
           },
-          { status: error.response?.status || 500 }
-        );
-      }
+        }
+      );
+    } catch (error) {
+      clearTimeout(timeoutId);
 
-      // Fallback error response
-      return NextResponse.json({ error: 'Unknown error occurred' }, { status: 500 });
+      console.error('Instagram API error:', {
+        message: (error as Error).message,
+        response: (error as InstagramError).response?.data,
+        status: (error as InstagramError).response?.status,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Ensure we always return valid JSON
+      return NextResponse.json(
+        {
+          error: 'Instagram API error',
+          details:
+            (error as InstagramError).response?.data?.error?.message || (error as Error).message,
+          status: (error as InstagramError).response?.status || 500,
+        },
+        {
+          status: (error as InstagramError).response?.status || 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     }
   } catch (error) {
-    console.error('Request processing error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Request processing error:', {
+      error,
+      timestamp: new Date().toISOString(),
+    });
+
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        message: (error as Error).message,
+      },
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   }
 }

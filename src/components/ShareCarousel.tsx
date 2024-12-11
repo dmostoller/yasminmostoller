@@ -46,9 +46,19 @@ export function ShareCarousel({ imageUrl, caption }: ShareCarouselProps) {
           caption,
           accessToken: freshToken,
         }),
+        // Add timeout handling
+        signal: AbortSignal.timeout(30000), // 30 second timeout
       });
 
-      const responseData = await shareResponse.json();
+      // Handle non-JSON responses
+      const responseText = await shareResponse.text();
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Invalid JSON response:', e + responseText);
+        throw new Error('Server returned invalid response');
+      }
 
       if (!shareResponse.ok) {
         throw new Error(responseData.error || `Failed to share (${shareResponse.status})`);
@@ -57,7 +67,11 @@ export function ShareCarousel({ imageUrl, caption }: ShareCarouselProps) {
       toast.success('Successfully shared to Instagram Feed');
     } catch (error) {
       console.error('Sharing error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to share to feed');
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast.error('Request timed out - please try again');
+      } else {
+        toast.error(error instanceof Error ? error.message : 'Failed to share to feed');
+      }
     } finally {
       setIsSharing(false);
     }
