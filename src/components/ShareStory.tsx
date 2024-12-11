@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Instagram } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { SecondaryIconButton } from './buttons/SecondaryIconButton';
+import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 
 interface ShareStoryProps {
   imageUrl: string;
@@ -81,7 +81,7 @@ export function StoryShare({ imageUrl, caption }: ShareStoryProps) {
   };
 
   return (
-    <SecondaryIconButton
+    <PrimaryIconButton
       onClick={shareToStory}
       icon={Instagram}
       disabled={isSharing}

@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Image } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { SecondaryIconButton } from './buttons/SecondaryIconButton';
+import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 
 interface ShareCarouselProps {
   imageUrl: string;
@@ -63,7 +63,7 @@ export function ShareCarousel({ imageUrl, caption }: ShareCarouselProps) {
   };
 
   return (
-    <SecondaryIconButton
+    <PrimaryIconButton
       onClick={shareToCarousel}
       icon={Image}
       disabled={isSharing}

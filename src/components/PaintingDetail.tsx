@@ -143,6 +143,12 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                 <FacebookShareButton url={shareUrl} hashtag="#art">
                   <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
                 </FacebookShareButton>
+
+                <SecondaryIconButton
+                  onClick={handleBlueSkyShare}
+                  icon={Bluesky}
+                  label="Share on BlueSky"
+                />
                 {isAdmin && (
                   <>
                     <StoryShare
@@ -153,16 +159,6 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                       imageUrl={painting.image || ''}
                       caption={`${painting.title} - ${painting.width || ''}" x ${painting.height}" - ${painting.materials || ''}`}
                     />
-                  </>
-                )}
-
-                <SecondaryIconButton
-                  onClick={handleBlueSkyShare}
-                  icon={Bluesky}
-                  label="Share on BlueSky"
-                />
-                {isAdmin && (
-                  <>
                     <PrimaryIconButton href={`/paintings/${painting.id}/edit`} icon={Edit} />
                     <PrimaryIconButton onClick={handleDeletePainting} icon={Trash2} />
                   </>
