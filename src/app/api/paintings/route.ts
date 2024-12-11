@@ -15,11 +15,11 @@ export async function GET() {
         sale_price: true,
         image: true,
         sold: true,
-        folder_id: true
+        folder_id: true,
       },
       orderBy: {
-        id: 'desc'
-      }
+        id: 'desc',
+      },
     });
 
     // Transform the data to match our frontend expectations
@@ -31,14 +31,15 @@ export async function GET() {
       height: painting.height || 0,
       sale_price: painting.sale_price || 0,
       image: painting.image || '',
-      sold: painting.sold || false
+      sold: painting.sold || false,
+      folder_id: painting.folder_id || null,
     }));
 
     return NextResponse.json(formattedPaintings, {
       status: 200,
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
-      }
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30',
+      },
     });
   } catch (error) {
     console.error('Database error:', error);
@@ -66,8 +67,8 @@ export async function POST(request: Request) {
         sale_price: body.sale_price ? parseInt(body.sale_price) : null,
         image: body.image,
         sold: body.sold === 'true',
-        folder_id: body.folder_id ? parseInt(body.folder_id) : null
-      }
+        folder_id: body.folder_id ? parseInt(body.folder_id) : null,
+      },
     });
 
     return NextResponse.json(newPainting, { status: 201 });

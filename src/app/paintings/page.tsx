@@ -13,6 +13,15 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 const ITEMS_PER_PAGE = 6;
 
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function PaintingsPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin ?? false;
@@ -42,7 +51,7 @@ export default function PaintingsPage() {
     return painting.title.toLowerCase().includes(searchQ.toLowerCase());
   });
 
-  const searchResults = results.filter((painting: Painting) => {
+  let searchResults = results.filter((painting: Painting) => {
     if (forSale === true) {
       return painting.sold !== true;
     } else {
@@ -50,7 +59,9 @@ export default function PaintingsPage() {
     }
   });
 
-  if (sortBy === 'Small') {
+  if (sortBy === 'Default') {
+    searchResults = shuffleArray(searchResults);
+  } else if (sortBy === 'Small') {
     searchResults.sort((a: Painting, b: Painting) =>
       (a.width ?? 0) * (a.height ?? 0) < (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
     );
@@ -59,25 +70,16 @@ export default function PaintingsPage() {
       (a.width ?? 0) * (a.height ?? 0) > (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
     );
   } else if (sortBy === 'Low') {
-    searchResults.sort((a: Painting, b: Painting) =>
-      (a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1
-    );
+    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1));
   } else if (sortBy === 'High') {
-    searchResults.sort((a: Painting, b: Painting) =>
-      (a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1
-    );
+    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1));
   }
 
   const folderResults = searchResults.filter((painting: Painting) => {
-    if (selectedFolder !== 'none') {
-      if (painting.folder_id === parseInt(selectedFolder, 10)) {
-        console.log(painting.folder_id);
-        return true;
-      }
-      return false;
-    } else {
+    if (selectedFolder === 'none') {
       return true;
     }
+    return painting.folder_id === Number(selectedFolder);
   });
 
   // Pagination logic
@@ -93,6 +95,7 @@ export default function PaintingsPage() {
 
   const handleSelectedFolder = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedFolder(e.target.value);
+    setCurrentPage(1);
   };
 
   return (
@@ -133,7 +136,7 @@ export default function PaintingsPage() {
           {/* Pagination Controls */}
           <div className="flex justify-center gap-2 mt-8">
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
                          px-4 py-2 text-white rounded
@@ -147,7 +150,7 @@ export default function PaintingsPage() {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
               className="inline-flex items-center justify-center bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400 
                          px-4 py-2 text-white rounded
