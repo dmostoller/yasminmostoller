@@ -36,7 +36,7 @@ export default function Search({
     setForSale(!forSale);
   }
 
-  const folderList = folders.map(folder => (
+  const folderList = folders.map((folder) => (
     <option key={folder.id} value={folder.id} className="px-4 py-2">
       {folder.name}
     </option>
@@ -49,7 +49,7 @@ export default function Search({
           type="text"
           value={searchQ}
           placeholder="Search..."
-          onChange={e => onSearch(e.target.value)}
+          onChange={(e) => onSearch(e.target.value)}
           className="w-full rounded-lg border border-[var(--text-secondary)] pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
         />
         <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
@@ -81,12 +81,7 @@ export default function Search({
       <div className="justify-self-center sm:justify-self-start">
         <label className="flex items-center gap-2">
           <div className="relative inline-flex items-center">
-            <input
-              type="checkbox"
-              className="peer sr-only"
-              checked={forSale}
-              onChange={toggleForSale}
-            />
+            <input type="checkbox" className="peer sr-only" checked={forSale} onChange={toggleForSale} />
             <div className="h-6 w-11 rounded-full bg-[var(--background-secondary)] after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-[var(--text-secondary)] after:bg-[var(--background-secondary)] after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300"></div>
           </div>
           <span className="text-sm font-medium text-[var(--text-primary)]">For Sale</span>

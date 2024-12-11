@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { PrimaryButton } from './buttons/PrimaryButton';
 
 function UploadWidget({ onSetImageUrl }) {
   const cloudinaryRef = useRef();
@@ -10,7 +11,7 @@ function UploadWidget({ onSetImageUrl }) {
       {
         cloudName: 'ddp2xfpyb',
         uploadPreset: 'upload_yasmin',
-        multiple: false //restrict upload to a single file
+        multiple: false, //restrict upload to a single file
         // sources: [ "local", "url"],
       },
       function (error, result) {
@@ -24,13 +25,12 @@ function UploadWidget({ onSetImageUrl }) {
 
   return (
     <>
-      <button
+      <PrimaryButton
         type="button"
-        className="w-full rounded-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 text-sm transition-colors duration-200"
+        text="Upload Image"
+        className="w-full rounded-md"
         onClick={() => widgetRef.current.open()}
-      >
-        Upload Image
-      </button>
+      />
     </>
   );
 }

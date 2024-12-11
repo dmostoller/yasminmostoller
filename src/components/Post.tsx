@@ -25,14 +25,11 @@ const Post: FC<PostType> = ({ id, title, content, image_url, video_url, date_add
         </div>
       )}
 
-      {video_url !== 'undefined' &&
-        video_url !== undefined &&
-        video_url !== null &&
-        video_url !== 'null' && (
-          <div>
-            <CldVideoPlayer width="1080" height="1920" src={video_url} />
-          </div>
-        )}
+      {video_url !== 'undefined' && video_url !== undefined && video_url !== null && video_url !== 'null' && (
+        <div className="video-player-wrapper">
+          <CldVideoPlayer width="1080" height="1920" src={video_url} />
+        </div>
+      )}
 
       {/* Content Section */}
       <div className="flex flex-col flex-grow p-6">

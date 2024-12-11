@@ -67,7 +67,7 @@ const NewsPage = () => {
       )}
 
       <div className="mt-6">
-        <div className="grid grid-cols-1 gap-6 justify-items-center">{blog}</div>
+        <div className="flex flex-col space-y-6 max-w-3xl mx-auto">{blog}</div>{' '}
       </div>
     </div>
   );

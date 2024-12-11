@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { PrimaryButton } from './buttons/PrimaryButton';
 
 function UploadVideoWidget({ onSetVideoUrl }) {
   const cloudinaryRef = useRef();
@@ -10,7 +11,7 @@ function UploadVideoWidget({ onSetVideoUrl }) {
       {
         cloudName: 'ddp2xfpyb',
         uploadPreset: 'yasmin_video',
-        multiple: false //restrict upload to a single file
+        multiple: false, //restrict upload to a single file
       },
       function (error, result) {
         if (!error && result && result.event === 'success') {
@@ -23,14 +24,12 @@ function UploadVideoWidget({ onSetVideoUrl }) {
 
   return (
     <>
-      <button
-        style={{ marginTop: '3px' }}
+      <PrimaryButton
         type="button"
-        className="w-full rounded-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 text-sm transition-colors duration-200"
+        text="Upload Video"
+        className="w-full mt-2 rounded-md"
         onClick={() => widgetRef.current.open()}
-      >
-        Upload Video
-      </button>
+      />
     </>
   );
 }

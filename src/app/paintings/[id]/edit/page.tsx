@@ -4,13 +4,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 import { ArrowLeft } from 'lucide-react';
 import UploadWidget from '@/components/UploadWidget';
 import type { Painting, Folder } from '@/lib/types';
 import { useFolders } from '@/hooks/useFolders';
 import { useUpdatePainting, useGetPainting } from '@/hooks/usePaintings';
 import { useQueryClient } from '@tanstack/react-query';
+import { PrimaryButton } from '@/components/buttons/PrimaryButton';
 
 export default function EditPaintingPage({ params }: { params: Promise<{ id: number }> }) {
   const unwrappedParams = React.use(params);
@@ -37,16 +38,8 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
   const formSchema = yup.object().shape({
     title: yup.string().required('Please enter a title'),
     materials: yup.string().required('Please enter materials used'),
-    width: yup
-      .number()
-      .integer()
-      .required('Please enter a width')
-      .min(0, 'Width cannot be negative'),
-    height: yup
-      .number()
-      .integer()
-      .required('Please enter a height')
-      .min(0, 'Height cannot be negative'),
+    width: yup.number().integer().required('Please enter a width').min(0, 'Width cannot be negative'),
+    height: yup.number().integer().required('Please enter a height').min(0, 'Height cannot be negative'),
     sale_price: yup.string().required('Please enter a price'),
     image: yup.string().required('Please enter an image link'),
     sold: yup.string().required('Please select a value'),
@@ -66,7 +59,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
       folder_id: painting?.folder_id || '',
     },
     validationSchema: formSchema,
-    onSubmit: async values => {
+    onSubmit: async (values) => {
       try {
         const updatedPainting = await updatePaintingMutation.mutateAsync({
           id,
@@ -93,48 +86,42 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
       {updatePaintingMutation.isError && (
         <h2 className="text-center text-red-500">{updatePaintingMutation.error.message}</h2>
       )}
-      <div className="container mx-auto min-h-screen max-w-2xl px-4 mt-16 mb-6">
-        <form className="space-y-6" onSubmit={formik.handleSubmit}>
-          <div className="flex items-center justify-center border-b border-border pb-4">
-            <h4 className="text-center text-2xl font-medium text-foreground">Edit Painting</h4>
+      <div className="container mx-auto min-h-screen max-w-5xl px-4 mt-16 mb-6">
+        <div className="flex items-center justify-center border-b border-border pb-4">
+          <h4 className="text-center text-2xl font-medium text-foreground">Edit Painting</h4>
+        </div>
+        <label className="flex items-center justify-between text-foreground py-2 mb-2">
+          <span>Upload image, then enter painting info...</span>
+          <Link href={`/paintings/${id}`} className="flex items-center text-blue-600 hover:text-blue-800">
+            <ArrowLeft className="mr-1 h-4 w-4" />
+            Back to Painting
+          </Link>
+        </label>
+        <form
+          className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8"
+          onSubmit={formik.handleSubmit}
+        >
+          {/* Left Column - Image Section */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              {imageUrl && (
+                <div className="relative h-64 w-full lg:h-max">
+                  <CldImage
+                    src={imageUrl}
+                    alt="Painting preview"
+                    width={800}
+                    height={600}
+                    className="rounded-md object-contain w-full h-full"
+                  />{' '}
+                </div>
+              )}
+              <UploadWidget onSetImageUrl={setImageUrl} />
+              <input type="hidden" name="image" value={formik.values.image} onChange={formik.handleChange} />
+              {formik.errors.image && <p className="text-center text-red-500">{formik.errors.image}</p>}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="flex items-center justify-between text-foreground">
-              <span>Upload image, then enter painting info...</span>
-              <Link
-                href={`/paintings/${id}`}
-                className="flex items-center text-blue-600 hover:text-blue-800"
-              >
-                <ArrowLeft className="mr-1 h-4 w-4" />
-                Back to Painting
-              </Link>
-            </label>
-
-            <UploadWidget onSetImageUrl={setImageUrl} />
-
-            {imageUrl && (
-              <div className="relative h-64 w-full">
-                <Image
-                  src={imageUrl}
-                  alt="Painting preview"
-                  fill
-                  className="rounded-md object-contain"
-                />
-              </div>
-            )}
-
-            <input
-              type="hidden"
-              name="image"
-              value={formik.values.image}
-              onChange={formik.handleChange}
-            />
-            {formik.errors.image && (
-              <p className="text-center text-red-500">{formik.errors.image}</p>
-            )}
-          </div>
-
+          {/* Right Column - Form Fields */}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground">Title</label>
@@ -146,9 +133,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                 placeholder="Title..."
                 className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
               />
-              {formik.errors.title && (
-                <p className="text-center text-red-500">{formik.errors.title}</p>
-              )}
+              {formik.errors.title && <p className="text-center text-red-500">{formik.errors.title}</p>}
             </div>
 
             <div>
@@ -177,9 +162,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                   placeholder="Width in inches..."
                   className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
                 />
-                {formik.errors.width && (
-                  <p className="text-center text-red-500">{formik.errors.width}</p>
-                )}
+                {formik.errors.width && <p className="text-center text-red-500">{formik.errors.width}</p>}
               </div>
 
               <div>
@@ -192,9 +175,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                   placeholder="Height in inches..."
                   className="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground"
                 />
-                {formik.errors.height && (
-                  <p className="text-center text-red-500">{formik.errors.height}</p>
-                )}
+                {formik.errors.height && <p className="text-center text-red-500">{formik.errors.height}</p>}
               </div>
             </div>
 
@@ -223,9 +204,7 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                 <option value="false">For Sale</option>
                 <option value="true">Sold</option>
               </select>
-              {formik.errors.sold && (
-                <p className="text-center text-red-500">{formik.errors.sold}</p>
-              )}
+              {formik.errors.sold && <p className="text-center text-red-500">{formik.errors.sold}</p>}
             </div>
 
             <div>
@@ -242,14 +221,20 @@ export default function EditPaintingPage({ params }: { params: Promise<{ id: num
                 <p className="text-center text-red-500">{formik.errors.folder_id}</p>
               )}
             </div>
+            <PrimaryButton
+              type="submit"
+              text="Submit"
+              className="w-full rounded-md"
+              disabled={formik.isSubmitting}
+              isLoading={formik.isSubmitting}
+            />
+            {/* <button
+              type="submit"
+              className="w-full rounded-full bg-teal-600 px-4 py-2 text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+            >
+              Submit
+            </button> */}
           </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-full bg-teal-600 px-4 py-2 text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
-          >
-            Submit
-          </button>
         </form>
       </div>
     </>
