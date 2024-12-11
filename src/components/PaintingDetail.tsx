@@ -1,5 +1,4 @@
 'use client';
-import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CldImage } from 'next-cloudinary';
@@ -12,7 +11,7 @@ import PaintingModal from '@/components/PaintingModal';
 import type { User } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 import { PrimaryButton } from './buttons/PrimaryButton';
-import { Edit, Trash2, Download, MessageSquare, Facebook, Instagram } from 'lucide-react';
+import { Edit, Trash2, Download, MessageSquare, Facebook } from 'lucide-react';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
 import { useDeletePainting, useGetPainting } from '@/hooks/usePaintings';
@@ -21,6 +20,8 @@ import ErrorMessage from './ErrorMessage';
 import { Bluesky } from './icons/Bluesky';
 import { Toaster } from 'react-hot-toast';
 import { FacebookShareButton } from 'react-share';
+import { StoryShare } from './ShareStory';
+import { ShareCarousel } from './ShareCarousel';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -76,27 +77,6 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       });
   };
 
-  // const handleFacebookShare = () => {
-  //   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com/';
-  //   const shareUrl = `${baseUrl}/paintings/${paintingId}`;
-  //   const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  //   const isTablet = window.matchMedia('(min-width: 769px) and (max-width: 1024px)').matches;
-
-  //   if (isMobile || isTablet) {
-  //     window.open(
-  //       `fb://share?url=${encodeURIComponent(shareUrl)}`,
-  //       'facebook-share-dialog',
-  //       'width=800,height=600'
-  //     );
-  //   } else {
-  //     window.open(
-  //       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-  //       'facebook-share-dialog',
-  //       'width=800,height=600'
-  //     );
-  //   }
-  // };
-
   const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com'}/paintings/${paintingId}`;
 
   const handleBlueSkyShare = () => {
@@ -109,48 +89,6 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       'bluesky-share-dialog',
       'width=800,height=600'
     );
-  };
-
-  const handleZapierWebhook = async () => {
-    if (!painting) {
-      console.error('Missing painting data');
-      return;
-    }
-
-    const originalUrl = painting.image;
-    const transformedImageUrl = originalUrl
-      ? originalUrl.replace('/upload/', '/upload/fl_attachment,f_jpg/') + '.jpg'
-      : '';
-
-    console.log('Original URL:', originalUrl);
-    console.log('Transformed URL:', transformedImageUrl);
-
-    const payload = {
-      caption:
-        `${painting.title} - ${painting.width || ''}" x ${painting.height}" - ${painting.materials || ''}`.trim(),
-      imageUrl: transformedImageUrl,
-      shareUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.yasminmostoller.com'}/paintings/${paintingId}`,
-    };
-
-    try {
-      const response = await fetch('/api/share-painting', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to share painting');
-      }
-
-      toast.success('Successfully shared painting to Zapier');
-    } catch (error) {
-      console.error('Share failed:', error);
-      toast.error('Failed to share painting. Please try again.');
-    } finally {
-    }
   };
 
   if (isLoading) return <LoadingSpinner />;
@@ -175,7 +113,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
               />
               {isModalOpen && painting.image && (
                 <PaintingModal
-                  imageUrl={painting.image}
+                  imageUrl={painting.image || ''}
                   title={painting.title}
                   onClose={handleCloseModal}
                 />
@@ -202,19 +140,22 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
 
               <div className="flex gap-2 mt-4">
                 <SecondaryIconButton href="/paintings" icon={Undo2} />
-                {/* <SecondaryIconButton
-                  onClick={handleFacebookShare}
-                  icon={Facebook}
-                  label="Share on Facebook"
-                /> */}
                 <FacebookShareButton url={shareUrl} hashtag="#art">
                   <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
                 </FacebookShareButton>
-                <SecondaryIconButton
-                  onClick={handleZapierWebhook}
-                  icon={Instagram}
-                  label="Share on Instagram"
-                />
+                {isAdmin && (
+                  <>
+                    <StoryShare
+                      imageUrl={painting.image || ''}
+                      caption={`${painting.title} - ${painting.width || ''}" x ${painting.height}" - ${painting.materials || ''}`}
+                    />
+                    <ShareCarousel
+                      imageUrl={painting.image || ''}
+                      caption={`${painting.title} - ${painting.width || ''}" x ${painting.height}" - ${painting.materials || ''}`}
+                    />
+                  </>
+                )}
+
                 <SecondaryIconButton
                   onClick={handleBlueSkyShare}
                   icon={Bluesky}

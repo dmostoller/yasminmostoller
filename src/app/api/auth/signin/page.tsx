@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import GoogleButton from '@/components/GoogleButton';
+import GoogleButton from '@/components/buttons/GoogleButton';
 import { Shield, Lock, UserCheck } from 'lucide-react';
 
 export default function SignInPage() {
@@ -65,8 +65,8 @@ export default function SignInPage() {
 
         <div className="space-y-6">
           <div className="py-8 border border-[var(--card-border)] rounded-lg bg-[var(--background)]">
-            <h2 className="text-lg font-semibold mb-6 text-center">Continue with Google</h2>
-            <div className="flex justify-center">
+            <h2 className="text-lg font-semibold mb-6 text-center">Sign In</h2>
+            <div className="flex justify-center space-x-2">
               <GoogleButton onClick={handleGoogleSignIn} />
             </div>
             <p className="text-center mt-6 text-sm text-[var(--text-secondary)] px-4">
