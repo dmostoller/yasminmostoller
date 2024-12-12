@@ -30,7 +30,7 @@ export default function PaintingsPage() {
   const { data: paintings, isLoading: paintingsLoading, error: paintingsError } = usePaintings();
   const { data: folders, isLoading: foldersLoading } = useFolders();
   const [shuffledPaintings, setShuffledPaintings] = useState<Painting[]>([]);
-  const [selectedFolder, setSelectedFolder] = useState('none');
+  const [selectedFolder, setSelectedFolder] = useState('');
   const [searchQ, setSearchQ] = useState('');
   const [sortBy, setSortBy] = useState('Default');
   const [forSale, setForSale] = useState(false);
@@ -94,7 +94,7 @@ export default function PaintingsPage() {
   }
 
   const folderResults = searchResults.filter((painting: Painting) => {
-    if (selectedFolder === 'none') {
+    if (!selectedFolder) {
       return true;
     }
     return painting.folder_id === Number(selectedFolder);

@@ -79,3 +79,28 @@ export function useDeletePainting() {
     },
   });
 }
+
+export function useAssignFolder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ paintingId, folderId }: { paintingId: number; folderId: number }) => {
+      const response = await fetch(`/api/paintings/${paintingId}/assign-folder`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ folderId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to assign folder');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['painting'] });
+    },
+  });
+}

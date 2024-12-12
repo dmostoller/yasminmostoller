@@ -3,6 +3,8 @@
 
 import { Search as SearchIcon } from 'lucide-react';
 import { ChangeEvent } from 'react';
+import { Select } from './Select';
+import { Input } from './Input';
 
 interface Folder {
   id: number;
@@ -36,47 +38,43 @@ export default function Search({
     setForSale(!forSale);
   }
 
-  const folderList = folders.map((folder) => (
-    <option key={folder.id} value={folder.id} className="px-4 py-2">
-      {folder.name}
-    </option>
-  ));
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-center max-w-6xl mx-auto">
       <div className="relative">
-        <input
+        <Input
           type="text"
           value={searchQ}
           placeholder="Search..."
           onChange={(e) => onSearch(e.target.value)}
-          className="w-full rounded-lg border border-[var(--text-secondary)] pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
+          icon={<SearchIcon className="h-4 w-4" />}
         />
         <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-secondary)]" />
       </div>
 
-      <select
-        className="w-full rounded-lg border border-[var(--text-secondary)] px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
+      <Select
         name="folder"
         value={selectedFolder}
         onChange={setSelectedFolder}
-      >
-        <option value="none">Select Folder: </option>
-        {folderList}
-      </select>
+        placeholder="Select a Folder"
+        options={folders.map((folder) => ({
+          value: folder.id,
+          label: folder.name,
+        }))}
+      />
 
-      <select
-        className="w-full rounded-lg border border-[var(--text-secondary)] px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
+      <Select
         name="sort"
         value={selected}
         onChange={sortBy}
-      >
-        <option value="Default">Sort by: </option>
-        <option value="Small">Size: Small - Large</option>
-        <option value="Large">Size: Large - Small</option>
-        <option value="Low">Price: Low - High</option>
-        <option value="High">Price: High - Low</option>
-      </select>
+        placeholder="Sort by"
+        options={[
+          { value: 'Default', label: 'Sort by' },
+          { value: 'Small', label: 'Size: Small - Large' },
+          { value: 'Large', label: 'Size: Large - Small' },
+          { value: 'Low', label: 'Price: Low - High' },
+          { value: 'High', label: 'Price: High - Low' },
+        ]}
+      />
 
       <div className="justify-self-center sm:justify-self-start">
         <label className="flex items-center gap-2">

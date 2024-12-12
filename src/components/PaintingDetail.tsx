@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
@@ -10,6 +10,8 @@ import CommentsList from '@/components/CommentsList';
 import PaintingModal from '@/components/PaintingModal';
 import type { User } from '@/lib/types';
 import { useSession } from 'next-auth/react';
+import { useFolders } from '@/hooks/useFolders';
+import { useAssignFolder } from '@/hooks/usePaintings';
 import { PrimaryButton } from './buttons/PrimaryButton';
 import { Edit, Trash2, Download, MessageSquare, Facebook } from 'lucide-react';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
@@ -22,9 +24,10 @@ import { Toaster } from 'react-hot-toast';
 import { FacebookShareButton } from 'react-share';
 import { StoryShare } from './ShareStory';
 import { ShareCarousel } from './ShareCarousel';
-import React from 'react';
+import { toast } from 'react-hot-toast';
 import { SecondaryButton } from './buttons/SecondaryButton';
 import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
+import { Select } from '@/components/Select';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -38,9 +41,18 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const { data: session }: { data: Session | null } = useSession();
   const isAdmin = session?.user?.is_admin;
   const { data: painting, isLoading, isError } = useGetPainting(paintingId);
+  const { data: folders } = useFolders();
+  const assignFolder = useAssignFolder();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const deletePainting = useDeletePainting();
+  const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (painting?.folder_id !== undefined) {
+      setCurrentFolderId(painting.folder_id);
+    }
+  }, [painting?.folder_id]);
 
   const handleImageClick = () => {
     setIsModalOpen(true);
@@ -48,6 +60,23 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleFolderChange = async (folderId: number) => {
+    try {
+      setCurrentFolderId(folderId); // Optimistic update
+      if (painting) {
+        await assignFolder.mutateAsync({
+          paintingId: painting.id,
+          folderId: folderId,
+        });
+      }
+      toast.success('Folder updated successfully');
+    } catch (error) {
+      setCurrentFolderId(painting?.folder_id || null); // Revert on error
+      console.error('Error assigning folder:', error);
+      toast.error('Failed to update folder');
+    }
   };
 
   const handleDeletePainting = async () => {
@@ -160,14 +189,34 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
               </div>
               <div className="mt-4">
                 {isAdmin && (
-                  <PrimaryButton
-                    icon={Download}
-                    text="Download"
-                    className="rounded-full"
-                    onClick={() =>
-                      handleDownload(painting.image || '/path/to/default/image.jpg', `${painting.title}.jpg`)
-                    }
-                  />
+                  <>
+                    <div className="flex items-center gap-4">
+                      <PrimaryButton
+                        icon={Download}
+                        text="Download"
+                        className="rounded-full"
+                        onClick={() =>
+                          handleDownload(
+                            painting.image || '/path/to/default/image.jpg',
+                            `${painting.title}.jpg`
+                          )
+                        }
+                      />
+                      <div className="flex-1 max-w-52">
+                        <Select
+                          value={currentFolderId || ''}
+                          onChange={(e) => handleFolderChange(Number(e.target.value))}
+                          placeholder="Select a folder"
+                          options={
+                            folders?.map((folder) => ({
+                              value: folder.id,
+                              label: folder.name,
+                            })) || []
+                          }
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
                 {!painting.sold && !isAdmin && (
                   <SecondaryButton
