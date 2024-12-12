@@ -99,3 +99,11 @@
 .prose a {
   @apply text-teal-600 hover:text-teal-700 transition-colors no-underline;
 }
+
+.thumbs-gallery .swiper-slide {
+  opacity: 0.4;
+}
+
+.thumbs-gallery .swiper-slide-thumb-active {
+  opacity: 1;
+}
