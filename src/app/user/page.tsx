@@ -8,23 +8,25 @@ import { FolderPlus, LineChart, CheckCircle } from 'lucide-react';
 import { Folder as FolderType } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 import { PrimaryButton } from '@/components/buttons/PrimaryButton';
+import { signOut } from 'next-auth/react';
 
 export default function UserPage() {
   const { data: session } = useSession();
   const user = session?.user;
   const [folders, setFolders] = useState<FolderType[]>([]);
   const [showFolderInput, setShowFolderInput] = useState<boolean>(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isAdmin = user?.is_admin;
 
   function toggleFolderInput() {
-    setShowFolderInput(prevVal => !prevVal);
+    setShowFolderInput((prevVal) => !prevVal);
   }
 
   useEffect(() => {
     if (isAdmin) {
       fetch(`/api/folders`)
-        .then(res => res.json())
+        .then((res) => res.json())
         .then((folders: FolderType[]) => {
           setFolders(folders);
         });
@@ -32,12 +34,12 @@ export default function UserPage() {
   }, [isAdmin]);
 
   const deleteFolder = (deleted_folder_id: number) => {
-    setFolders(folders => folders.filter(folder => folder.id !== deleted_folder_id));
+    setFolders((folders) => folders.filter((folder) => folder.id !== deleted_folder_id));
   };
 
   const updateFolders = (updatedFolder: FolderType) => {
-    setFolders(folders =>
-      folders.map(folder => (folder.id === updatedFolder.id ? updatedFolder : folder))
+    setFolders((folders) =>
+      folders.map((folder) => (folder.id === updatedFolder.id ? updatedFolder : folder))
     );
   };
 
@@ -45,14 +47,31 @@ export default function UserPage() {
     setFolders([...folders, newFolder]);
   };
 
-  const foldersList = folders.map(folder => {
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch('/api/user', {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        await signOut({ redirect: true, callbackUrl: '/' });
+      } else {
+        throw new Error('Failed to delete account');
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      // You might want to show an error message to the user here
+    }
+  };
+
+  const foldersList = folders.map((folder) => {
     return (
       <Folder
         onDeleteFolder={deleteFolder}
         key={folder.id}
         id={folder.id}
         name={folder.name}
-        onUpdateFolders={folder => updateFolders(folder)}
+        onUpdateFolders={(folder) => updateFolders(folder)}
       />
     );
   });
@@ -73,10 +92,42 @@ export default function UserPage() {
           <div className="m-6 rounded-lg border border-[var(--card-border)] bg-[var(--background-elevated)] p-8 shadow-md text-center">
             {user && (
               <>
-                <div className="text-xl font-semibold text-[var(--text-primary)]">
-                  {user.username}
-                </div>
+                <div className="text-xl font-semibold text-[var(--text-primary)]">{user.username}</div>
                 <div className="text-sm text-[var(--text-secondary)]">{user.email}</div>
+                <div className="mt-6 pt-6 border-t border-[var(--border)]">
+                  {showDeleteConfirm ? (
+                    <div className="space-y-4">
+                      <p className="text-sm text-[var(--text-danger)]">
+                        Are you sure? This action cannot be undone.
+                      </p>
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={() => handleDeleteAccount()}
+                          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                        >
+                          Yes, delete my account
+                        </button>
+                        <button
+                          onClick={() => setShowDeleteConfirm(false)}
+                          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium 
+                      text-[var(--text-primary)] bg-[var(--background)] border-2 border-red-500 rounded-md 
+                      hover:bg-red-500 hover:text-white hover:border-transparent
+                      focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 
+                      focus-visible:ring-offset-2 transition-colors"
+                    >
+                      Delete Account
+                    </button>
+                  )}
+                </div>
               </>
             )}
           </div>
@@ -124,9 +175,7 @@ export default function UserPage() {
                     />
                   )}
                 </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {foldersList}
-                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">{foldersList}</div>
               </div>
             </div>
           </>
