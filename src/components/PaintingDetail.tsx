@@ -28,6 +28,7 @@ import { toast } from 'react-hot-toast';
 import { SecondaryButton } from './buttons/SecondaryButton';
 import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 import { Select } from '@/components/Select';
+import CommentForm from './CommentForm';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -44,7 +45,6 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const { data: folders } = useFolders();
   const assignFolder = useAssignFolder();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const deletePainting = useDeletePainting();
   const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
 
@@ -227,31 +227,36 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                   />
                 )}
               </div>
+              <div className="mt-16">
+                {session?.user ? (
+                  <div className="bg-[var(--background-secondary)] rounded-lg p-6 shadow-lg border border-[var(--card-border)]">
+                    <CommentForm
+                      user={session.user}
+                      onAddComment={() => {}}
+                      paintingId={painting.id}
+                      onChangeIsComFormVis={() => {}}
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-[var(--background-secondary)] rounded-lg p-6 shadow-lg border border-[var(--card-border)]">
+                    <p className="text-center mb-4">Join the conversation</p>
+                    <Link
+                      href="/api/auth/signin"
+                      className="block w-full py-2 px-4 text-center bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+                    >
+                      Sign In to Comment
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="mt-8">
-          <button
-            className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition mb-4"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={isOpen ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}
-              />
-            </svg>
-            {isOpen ? 'Hide Comment Section' : 'Show Comment Section'}
-          </button>
-
-          {isOpen && (
-            <div className="bg-[var(--background-secondary)] rounded-lg shadow p-4">
-              <CommentsList user={session?.user} painting_id={painting.id} />
-            </div>
-          )}
+          <div className="bg-[var(--background-secondary)] rounded-lg shadow p-4">
+            <CommentsList user={session?.user} painting_id={painting.id} />
+          </div>
         </div>
       </div>
     </div>
