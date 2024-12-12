@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import axios from 'axios';
-import { Undo2 } from 'lucide-react';
+import { Undo2, ShoppingCart } from 'lucide-react';
 import fileDownload from 'js-file-download';
 import CommentsList from '@/components/CommentsList';
 import PaintingModal from '@/components/PaintingModal';
@@ -13,7 +13,7 @@ import { useSession } from 'next-auth/react';
 import { useFolders } from '@/hooks/useFolders';
 import { useAssignFolder } from '@/hooks/usePaintings';
 import { PrimaryButton } from './buttons/PrimaryButton';
-import { Edit, Trash2, Download, MessageSquare, Facebook } from 'lucide-react';
+import { Edit, Trash2, Download, Facebook } from 'lucide-react';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
 import { useDeletePainting, useGetPainting } from '@/hooks/usePaintings';
@@ -97,10 +97,10 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       .get(url, {
         responseType: 'blob',
       })
-      .then((res) => {
+      .then(res => {
         fileDownload(res.data, filename);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Error downloading file:', error);
       });
   };
@@ -167,11 +167,31 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
               </div>
 
               <div className="flex gap-2 mt-4">
-                <SecondaryIconButton href="/paintings" icon={Undo2} />
+                <SecondaryIconButton href="/paintings" icon={Undo2} label="Back to Paintings" />
                 <FacebookShareButton url={shareUrl} hashtag="#art">
                   <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
                 </FacebookShareButton>
-                <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
+                <SecondaryIconButton
+                  onClick={handleBlueSkyShare}
+                  icon={Bluesky}
+                  label="Share on BlueSky"
+                />
+                {!painting.sold && !isAdmin && (
+                  // <SecondaryIconButton
+                  //   icon={ShoppingCart}
+                  //   href="/contact"
+                  //   label="Purchase Inquiry"
+                  // />
+                  <SecondaryIconButton
+                    icon={ShoppingCart}
+                    href={`/contact?paintingName=${encodeURIComponent(painting.title)}${
+                      painting.materials ? `&medium=${encodeURIComponent(painting.materials)}` : ''
+                    }${
+                      session?.user?.email ? `&email=${encodeURIComponent(session.user.email)}` : ''
+                    }${session?.user?.username ? `&name=${encodeURIComponent(session.user.username)}` : ''}`}
+                    label="Purchase Inquiry"
+                  />
+                )}
                 {isAdmin && (
                   <>
                     <StoryShare
@@ -205,10 +225,10 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                       <div className="flex-1 max-w-52">
                         <Select
                           value={currentFolderId || ''}
-                          onChange={(e) => handleFolderChange(Number(e.target.value))}
+                          onChange={e => handleFolderChange(Number(e.target.value))}
                           placeholder="Select a folder"
                           options={
-                            folders?.map((folder) => ({
+                            folders?.map(folder => ({
                               value: folder.id,
                               label: folder.name,
                             })) || []
@@ -218,34 +238,24 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                     </div>
                   </>
                 )}
-                {!painting.sold && !isAdmin && (
-                  <SecondaryButton
-                    text="Purchase Inquiry"
-                    href="/contact"
-                    className="rounded-full"
-                    icon={MessageSquare}
-                  />
-                )}
               </div>
-              <div className="mt-16">
+              <div className="mt-4 ">
                 {session?.user ? (
-                  <div className="bg-[var(--background-secondary)] rounded-lg p-6 shadow-lg border border-[var(--card-border)]">
+                  <div className="pb-6 pt-3 text-center">
                     <CommentForm
                       user={session.user}
                       onAddComment={() => {}}
                       paintingId={painting.id}
-                      onChangeIsComFormVis={() => {}}
                     />
                   </div>
                 ) : (
-                  <div className="bg-[var(--background-secondary)] rounded-lg p-6 shadow-lg border border-[var(--card-border)]">
+                  <div className="bg-[var(--background-secondary)] rounded-lg p-6 shadow-lg border border-[var(--card-border)] max-w-full md:max-w-xs">
                     <p className="text-center mb-4">Join the conversation</p>
-                    <Link
+                    <SecondaryButton
                       href="/api/auth/signin"
-                      className="block w-full py-2 px-4 text-center bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
-                    >
-                      Sign In to Comment
-                    </Link>
+                      text="Sign In to Comment"
+                      className="w-full"
+                    />
                   </div>
                 )}
               </div>

@@ -4,24 +4,17 @@
 import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { X } from 'lucide-react';
 import { User, PostComment } from '@/lib/types';
-import { PrimaryButton } from './buttons/PrimaryButton';
 import { usePostComments } from '@/hooks/usePostComments';
+import { SecondaryButton } from './buttons/SecondaryButton';
 
 interface PostCommentFormProps {
   onAddComment: (comment: PostComment) => void;
   postId: number;
-  onChangeIsComFormVis: () => void;
   user: User;
 }
 
-export default function PostCommentForm({
-  onAddComment,
-  postId,
-  onChangeIsComFormVis,
-  user,
-}: PostCommentFormProps) {
+export default function PostCommentForm({ onAddComment, postId, user }: PostCommentFormProps) {
   const { addPostComment } = usePostComments();
   const [error, setError] = useState<string | null>(null);
 
@@ -51,7 +44,7 @@ export default function PostCommentForm({
   });
 
   return (
-    <div className="container mx-auto max-w-2xl">
+    <div className="container max-w-full md:max-w-xs">
       <form
         onSubmit={formik.handleSubmit}
         className="bg-[var(--background-secondary)] shadow-sm rounded-lg p-4"
@@ -60,35 +53,26 @@ export default function PostCommentForm({
           <div className="flex justify-between items-center">
             <label
               htmlFor="comment"
-              className="block text-sm font-medium text-[var(--text-primary)]"
+              className="block text-sm font-medium text-[var(--text-secondary)]"
             >
-              Add Comment
+              Add A Comment
             </label>
-            <button
-              type="button"
-              onClick={onChangeIsComFormVis}
-              className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-            >
-              <X className="h-5 w-5" />
-            </button>
           </div>
           <textarea
-            rows={2}
+            rows={3}
             id="comment"
             name="comment"
             value={formik.values.comment}
             onChange={formik.handleChange}
             placeholder="Your comment here"
-            className="w-full rounded-md border-[var(--text-secondary)] shadow-sm focus:border-teal-500 focus:ring-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
+            className="w-full rounded-md border border-[var(--card-border)] shadow-sm focus:border-teal-500 focus:ring-teal-500 bg-[var(--background-secondary)] text-[var(--text-primary)]"
           />
           {formik.errors.comment && (
             <p className="text-red-500 text-center text-sm">{formik.errors.comment}</p>
           )}
         </div>
-        <div className="mt-4">
-          <PrimaryButton type="submit" className="rounded-full w-full">
-            Submit
-          </PrimaryButton>
+        <div className="mt-1">
+          <SecondaryButton type="submit" className="w-full" text="Comment" />
         </div>
       </form>
       {error && <div className="mt-2 text-red-500 text-center">{error}</div>}

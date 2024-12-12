@@ -20,6 +20,8 @@ import { FacebookShareButton } from 'react-share';
 import { StoryShare } from './ShareStory';
 import { ShareCarousel } from './ShareCarousel';
 import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
+import PostCommentForm from './PostCommentForm';
+import { SecondaryButton } from './buttons/SecondaryButton';
 
 interface PostDetailProps {
   postId: number;
@@ -76,21 +78,23 @@ export default function PostDetail({ postId }: PostDetailProps) {
   return (
     <div className="container mx-auto min-h-screen px-4 mt-12">
       <Toaster position="top-center" />
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-lg bg-[var(--background-secondary)] border border-[var(--card-border)] shadow-md">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-lg shadow-md">
         <div className="md:flex">
           {/* Left column - Media */}
           <div className="md:w-3/4">
-            {post.image_url !== 'undefined' && post.image_url !== null && post.image_url !== 'null' && (
-              <div>
-                <CldImage
-                  width="960"
-                  height="600"
-                  src={post.image_url || ''}
-                  alt={post.title || 'Post image'}
-                  sizes="100vw"
-                />
-              </div>
-            )}
+            {post.image_url !== 'undefined' &&
+              post.image_url !== null &&
+              post.image_url !== 'null' && (
+                <div>
+                  <CldImage
+                    width="960"
+                    height="600"
+                    src={post.image_url || ''}
+                    alt={post.title || 'Post image'}
+                    sizes="100vw"
+                  />
+                </div>
+              )}
             {videoUrl && videoUrl !== 'undefined' && videoUrl !== 'null' && (
               <div className="video-player-wrapper">
                 <CldVideoPlayer
@@ -123,16 +127,26 @@ export default function PostDetail({ postId }: PostDetailProps) {
               <FacebookShareButton url={shareUrl} hashtag="#art">
                 <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
               </FacebookShareButton>
-              <SecondaryIconButton onClick={handleBlueSkyShare} icon={Bluesky} label="Share on BlueSky" />
+              <SecondaryIconButton
+                onClick={handleBlueSkyShare}
+                icon={Bluesky}
+                label="Share on BlueSky"
+              />
 
               {session?.user && isAdmin && (
                 <>
                   {post.image_url &&
                     post.image_url !== 'undefined' &&
                     post.image_url !== 'null' &&
-                    (!videoUrl || videoUrl === 'undefined' || videoUrl === 'null' || videoUrl === '') && (
+                    (!videoUrl ||
+                      videoUrl === 'undefined' ||
+                      videoUrl === 'null' ||
+                      videoUrl === '') && (
                       <>
-                        <StoryShare imageUrl={post.image_url} caption={`${post.title} - ${post.content}`} />
+                        <StoryShare
+                          imageUrl={post.image_url}
+                          caption={`${post.title} - ${post.content}`}
+                        />
                         <ShareCarousel
                           imageUrl={post.image_url}
                           caption={`${post.title} - ${stripHtmlAndMarkdown(post.content || '')}`}
@@ -144,10 +158,26 @@ export default function PostDetail({ postId }: PostDetailProps) {
                 </>
               )}
             </div>
+            <div className="mt-4">
+              {session?.user ? (
+                <div className="pb-6 pt-3 text-center">
+                  <PostCommentForm user={session?.user} onAddComment={() => {}} postId={post.id} />
+                </div>
+              ) : (
+                <div className="bg-[var(--background-secondary)] rounded-lg p-6 shadow-lg border border-[var(--card-border)] max-w-full md:max-w-xs">
+                  <p className="text-center mb-4">Join the conversation</p>
+                  <SecondaryButton
+                    href="/api/auth/signin"
+                    text="Sign In to Comment"
+                    className="w-full"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-      <div className="mt-8 rounded-lg bg-[var(--background-secondary)] border border-[var(--card-border)] p-6 shadow-md">
+      <div className="mt-8 rounded-lg p-6 shadow-md">
         <PostCommentsList
           user={
             session?.user
