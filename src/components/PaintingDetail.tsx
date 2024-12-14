@@ -123,7 +123,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   if (isError || !painting) return <ErrorMessage message="Failed to load painting" />;
 
   return (
-    <div className="flex justify-center w-full">
+    <div className="flex justify-center w-full min-h-screen">
       <Toaster position="top-center" />
       <div className="container mx-auto max-w-6xl px-4">
         <div className="mt-12 rounded-lg shadow-lg bg-[var(--background-secondary)]">
