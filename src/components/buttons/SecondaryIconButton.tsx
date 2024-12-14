@@ -28,7 +28,7 @@ export const SecondaryIconButton: FC<SecondaryIconButtonProps> = ({
   const [showLabel, setShowLabel] = useState(false);
 
   const baseClasses = `
-    p-2 text-xl rounded-full relative
+    p-2 text-lg rounded-full relative
     bg-gradient-to-t from-violet-600 via-blue-500 to-teal-400
     text-teal-500 ${!disabled && 'hover:text-white'}
     before:absolute before:inset-[2px] before:bg-[var(--background)] before:rounded-full before:z-[0]

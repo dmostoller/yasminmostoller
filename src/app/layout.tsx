@@ -8,6 +8,7 @@ import ClientQueryProvider from '@/context/ClientQueryProvider';
 import Script from 'next/script';
 import Head from 'next/head';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -51,7 +52,8 @@ export default function RootLayout({
         <ClientQueryProvider>
           <ClientSessionProvider>
             <Nav />
-            <main className="flex-grow pt-[72px]">{children}</main>
+            <main className="flex-grow pt-[72px] px-2">{children}</main>
+            <SpeedInsights />
             <Analytics />
             <Footer />
           </ClientSessionProvider>
@@ -61,7 +63,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="beforeInteractive"
         />
-        <Script src="https://upload-widget.cloudinary.com/global/all.js" strategy="beforeInteractive" />
+        <Script
+          src="https://upload-widget.cloudinary.com/global/all.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );
