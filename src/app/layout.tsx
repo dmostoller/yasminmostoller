@@ -51,7 +51,7 @@ export default function RootLayout({
         <ClientQueryProvider>
           <ClientSessionProvider>
             <Nav />
-            <main className="flex-grow pt-[72px]">{children}</main>
+            <main className="flex-grow pt-[72px] px-2">{children}</main>
             <Analytics />
             <Footer />
           </ClientSessionProvider>
@@ -61,7 +61,10 @@ export default function RootLayout({
           crossOrigin="anonymous"
           strategy="beforeInteractive"
         />
-        <Script src="https://upload-widget.cloudinary.com/global/all.js" strategy="beforeInteractive" />
+        <Script
+          src="https://upload-widget.cloudinary.com/global/all.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

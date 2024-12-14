@@ -123,7 +123,7 @@ export default function PostDetail({ postId }: PostDetailProps) {
               <FormattedContent content={post.content || ''} />
             </div>
             <div className="flex gap-2 pt-4">
-              <SecondaryIconButton href="/news" icon={Undo2} />
+              <SecondaryIconButton href="/news" icon={Undo2} label="Back to News" />
               <FacebookShareButton url={shareUrl} hashtag="#art">
                 <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
               </FacebookShareButton>

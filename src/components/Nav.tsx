@@ -113,14 +113,20 @@ const Nav = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 cursor-pointer">
-            <Image src="/images/y1.png" alt="logo" width={60} height={60} className="object-contain" />
+            <Image
+              src="/images/y1.png"
+              alt="logo"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
           </Link>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden z-[999]">
             <button
               onClick={toggleMobileMenu}
-              className="text-[var(--text-secondary)] hover:text-teal-500 focus:outline-none"
+              className="text-[var(--text-secondary)] hover:text-teal-500 focus:outline-none mr-1"
             >
               <MenuIcon isOpen={isMenuOpen} />
             </button>
@@ -137,7 +143,7 @@ const Nav = () => {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-2">{renderAuthButtons()}</div>
+          <div className="hidden md:flex items-center space-x-2 mr-1">{renderAuthButtons()}</div>
         </div>
 
         {/* Mobile Menu */}
