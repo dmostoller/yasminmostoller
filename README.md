@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Yasmin Mostoller Portfolio
 
-## Getting Started
+A professional portfolio website for artist Yasmin Mostoller, showcasing her artwork and
+professional journey. Built with modern web technologies and featuring a responsive design.
 
-First, run the development server:
+## 🛠 Tech Stack
+
+- **Framework**: [Next.js 15](https://nextjs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/)
+- **Database**: [Postgresql](https://www.postgresql.org/)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
+- **Text Editor**: TinyMCE
+- **Media Management**: Cloudinary
+- **State Management**: [TanStack Query](https://tanstack.com/query)
+- **Forms**: Formik + Yup
+- **UI Components**: Custom components with Lucide React icons
+- **Analytics**: Vercel Analytics & Speed Insights
+- **Animation**: Framer Motion
+
+## ✨ Key Features
+
+- Responsive image gallery
+- Contact form with EmailJS integration
+- Admin dashboard with content management
+- Social media integration
+- SEO optimization with Next.js metadata
+- Image optimization with next/image
+- Cloudinary video integration
+- Dark/light mode support
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm/yarn
+- Git
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone <repository-url>
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+
+# Generate Prisma client
+npx prisma generate
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔧 Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Required environment variables grouped by function:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Authentication
+NEXTAUTH_URL         
+NEXTAUTH_SECRET    
+GOOGLE_CLIENT_ID     
+GOOGLE_CLIENT_SECRET  
 
-## Learn More
+### Database
+DATABASE_URL         
+DIRECT_URL  
+NEXT_PUBLIC_API_URL
 
-To learn more about Next.js, take a look at the following resources:
+### API Keys
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+NEXT_PUBLIC_TINY_API_KEY        
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME 
+EMAILJS_SERVICE_ID 
+EMAILJS_TEMPLATE_ID 
+EMAILJS_PUBLIC_KEY
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Instagram Integration
+INSTAGRAM_APP_ID              
+INSTAGRAM_APP_SECRET         
 
-## Deploy on Vercel
+## 📦 Main Dependencies
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+@prisma/client - Database ORM 
+@tanstack/react-query - Server state management 
+next-auth - Authentication 
+next-cloudinary - Media management 
+framer-motion - Animations 
+react-hot-toast - Toast notifications
+swiper - Image carousel 
+formik & yup - Form handling and validation
