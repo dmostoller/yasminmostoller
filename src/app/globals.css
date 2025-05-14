@@ -3,36 +3,111 @@
 @tailwind utilities;
 
 :root {
+  /* Base colors */
   --background: #ffffff;
   --foreground: #171717;
-  --card-background: #ededed;
+
+  /* Card styles */
+  --card: #f8f9fa;
+  --card-foreground: #171717;
   --card-border: #e5e7eb;
-  --button-background: #fdfdfd;
-  --button-border: #c4c4c4;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
+
+  /* Primary colors - added a teal accent */
+  --primary: #0891b2;
+  --primary-foreground: #ffffff;
+
+  /* Secondary colors */
+  --secondary: #f1f5f9;
+  --secondary-foreground: #334155;
+
+  /* Accent colors - added a warm purple */
+  --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
+
+  /* UI elements */
+  --muted: #f3f4f6;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0891b2;
+
+  /* Destructive */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Button styles */
+  --button-background: #f8fafc;
+  --button-border: #cbd5e1;
+
+  /* Text colors */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+
+  /* Gray scale */
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
-  --toast-background: #fff;
-  --toast-text: #1f2937;
+
+  /* Toast */
+  --toast-background: #ffffff;
+  --toast-text: #0f172a;
   --toast-border: #e2e8f0;
+
+  /* Radius */
+  --radius-sm: 0.3rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.8rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card-background: #1a1a1a;
-    --card-border: #2d2d2d;
-    --button-background: #131313;
-    --button-border: #4f4f50;
-    --text-primary: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --gray-50: #1a1a1a;
-    --gray-100: #262626;
-    --toast-background: #1f2937;
-    --toast-text: #f3f4f6;
-    --toast-border: #374151;
+    /* Base colors */
+    --background: #0f172a;
+    --foreground: #f8fafc;
+
+    /* Card styles */
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+    --card-border: #334155;
+
+    /* Primary colors */
+    --primary: #06b6d4;
+    --primary-foreground: #f8fafc;
+
+    /* Secondary colors */
+    --secondary: #1e293b;
+    --secondary-foreground: #e2e8f0;
+
+    /* Accent colors */
+    --accent: #a78bfa;
+    --accent-foreground: #f8fafc;
+
+    /* UI elements */
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #334155;
+    --input: #334155;
+    --ring: #06b6d4;
+
+    /* Destructive */
+    --destructive: #f87171;
+    --destructive-foreground: #f8fafc;
+
+    /* Button styles */
+    --button-background: #1e293b;
+    --button-border: #475569;
+
+    /* Text colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+
+    /* Gray scale */
+    --gray-50: #1e293b;
+    --gray-100: #334155;
+
+    /* Toast */
+    --toast-background: #1e293b;
+    --toast-text: #f1f5f9;
+    --toast-border: #475569;
   }
 }
 
