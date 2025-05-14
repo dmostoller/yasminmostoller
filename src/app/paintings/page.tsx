@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, Suspense, useCallback, useEffect } from 'react';
+import React, { useState, Suspense, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import PaintingsList from '@/components/PaintingsList';
 import PaintingSkeleton from '@/components/PaintingSkeleton';
@@ -15,40 +15,23 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 // const ITEMS_PER_PAGE = 6;
 const ITEMS_PER_BATCH = 6;
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
 export default function PaintingsPage() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.is_admin ?? false;
   const { data: paintings, isLoading: paintingsLoading, error: paintingsError } = usePaintings();
   const { data: folders, isLoading: foldersLoading } = useFolders();
-  const [shuffledPaintings, setShuffledPaintings] = useState<Painting[]>([]);
   const [selectedFolder, setSelectedFolder] = useState('');
   const [searchQ, setSearchQ] = useState('');
-  const [sortBy, setSortBy] = useState('Default');
+  const [sortBy, setSortBy] = useState('Newest');
   const [forSale, setForSale] = useState(false);
   const [displayedItems, setDisplayedItems] = useState(ITEMS_PER_BATCH);
 
   const loadMore = useCallback(() => {
-    setDisplayedItems((prev) => prev + ITEMS_PER_BATCH);
+    setDisplayedItems(prev => prev + ITEMS_PER_BATCH);
     setIsFetching(false);
   }, []);
 
   const { isFetching, setIsFetching, lastElementRef } = useInfiniteScroll(loadMore);
-
-  useEffect(() => {
-    if (paintings && !shuffledPaintings.length) {
-      const shuffled = shuffleArray(paintings);
-      setShuffledPaintings(shuffled);
-    }
-  }, [paintings, shuffledPaintings.length]);
 
   if (paintingsLoading || foldersLoading) {
     return <LoadingSpinner />;
@@ -63,13 +46,11 @@ export default function PaintingsPage() {
     );
   }
 
-  const results = (shuffledPaintings.length ? shuffledPaintings : (paintings ?? [])).filter(
-    (painting: Painting) => {
-      return painting.title.toLowerCase().includes(searchQ.toLowerCase());
-    }
-  );
+  const results = (paintings ?? []).filter((painting: Painting) => {
+    return painting.title.toLowerCase().includes(searchQ.toLowerCase());
+  });
 
-  let searchResults = results.filter((painting: Painting) => {
+  const searchResults = results.filter((painting: Painting) => {
     if (forSale === true) {
       return painting.sold !== true;
     } else {
@@ -77,8 +58,10 @@ export default function PaintingsPage() {
     }
   });
 
-  if (sortBy === 'Default') {
-    searchResults = [...searchResults];
+  if (sortBy === 'Newest') {
+    searchResults.sort((a: Painting, b: Painting) => (Number(a.id) > Number(b.id) ? -1 : 1));
+  } else if (sortBy === 'Oldest') {
+    searchResults.sort((a: Painting, b: Painting) => (Number(a.id) < Number(b.id) ? -1 : 1));
   } else if (sortBy === 'Small') {
     searchResults.sort((a: Painting, b: Painting) =>
       (a.width ?? 0) * (a.height ?? 0) < (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
@@ -88,9 +71,13 @@ export default function PaintingsPage() {
       (a.width ?? 0) * (a.height ?? 0) > (b.width ?? 0) * (b.height ?? 0) ? -1 : 1
     );
   } else if (sortBy === 'Low') {
-    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1));
+    searchResults.sort((a: Painting, b: Painting) =>
+      (a.sale_price ?? 0) < (b.sale_price ?? 0) ? -1 : 1
+    );
   } else if (sortBy === 'High') {
-    searchResults.sort((a: Painting, b: Painting) => ((a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1));
+    searchResults.sort((a: Painting, b: Painting) =>
+      (a.sale_price ?? 0) > (b.sale_price ?? 0) ? -1 : 1
+    );
   }
 
   const folderResults = searchResults.filter((painting: Painting) => {
