@@ -109,7 +109,7 @@ const Nav = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-[var(--background)] shadow-md z-50">
-      <div className="max-w-screen-2xl mx-auto p-2">
+      <div className="mx-auto p-2">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 cursor-pointer">

@@ -77,7 +77,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         height: parseInt(body.height),
         sale_price: parseInt(body.sale_price),
         image: body.image,
-        sold: body.sold === 'true',
+        sold: typeof body.sold === 'boolean' ? body.sold : body.sold === 'true',
         folder_id: parseInt(body.folder_id)
       }
     });

@@ -182,3 +182,37 @@
 .thumbs-gallery .swiper-slide-thumb-active {
   opacity: 1;
 }
+
+/* Image fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.image-fade-in {
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+.image-loading {
+  opacity: 0;
+}
+
+.image-loaded {
+  opacity: 1;
+  transition: opacity 0.6s ease-in-out;
+}
+
+/* Page transitions */
+.painting-detail-enter {
+  opacity: 0;
+}
+
+.painting-detail-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+}
+
