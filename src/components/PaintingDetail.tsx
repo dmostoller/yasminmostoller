@@ -60,11 +60,16 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   
   // Ensure we're comparing numbers to numbers
   const currentIndex = sortedPaintings.findIndex(p => Number(p.id) === Number(paintingId));
-  // Previous goes to newer painting (lower index in desc sorted array)
-  const previousPainting = currentIndex > 0 ? sortedPaintings[currentIndex - 1] : null;
-  // Next goes to older painting (higher index in desc sorted array)
-  const nextPainting =
-    currentIndex < sortedPaintings.length - 1 ? sortedPaintings[currentIndex + 1] : null;
+  
+  let previousPainting = null;
+  let nextPainting = null;
+  
+  if (currentIndex !== -1) {
+    // Previous goes to newer painting (lower index in desc sorted array)
+    previousPainting = currentIndex > 0 ? sortedPaintings[currentIndex - 1] : null;
+    // Next goes to older painting (higher index in desc sorted array)
+    nextPainting = currentIndex < sortedPaintings.length - 1 ? sortedPaintings[currentIndex + 1] : null;
+  }
 
   useEffect(() => {
     if (painting?.folder_id !== undefined) {
