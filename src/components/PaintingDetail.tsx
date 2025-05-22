@@ -1,10 +1,10 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import axios from 'axios';
-import { Undo2, ShoppingCart } from 'lucide-react';
+import { Undo2, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import fileDownload from 'js-file-download';
 import CommentsList from '@/components/CommentsList';
 import PaintingModal from '@/components/PaintingModal';
@@ -16,8 +16,7 @@ import { PrimaryButton } from './buttons/PrimaryButton';
 import { Edit, Trash2, Download, Facebook } from 'lucide-react';
 import { PrimaryIconButton } from './buttons/PrimaryIconButton';
 import { SecondaryIconButton } from './buttons/SecondaryIconButton';
-import { useDeletePainting, useGetPainting } from '@/hooks/usePaintings';
-import LoadingSpinner from './LoadingSpinner';
+import { useDeletePainting, useGetPainting, usePaintings } from '@/hooks/usePaintings';
 import ErrorMessage from './ErrorMessage';
 import { Bluesky } from './icons/Bluesky';
 import { Toaster } from 'react-hot-toast';
@@ -29,6 +28,7 @@ import { SecondaryButton } from './buttons/SecondaryButton';
 import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 import { Select } from '@/components/Select';
 import CommentForm from './CommentForm';
+import PaintingDetailSkeleton from './PaintingDetailSkeleton';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -42,11 +42,29 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
   const { data: session }: { data: Session | null } = useSession();
   const isAdmin = session?.user?.is_admin;
   const { data: painting, isLoading, isError } = useGetPainting(paintingId);
+  const { data: allPaintings } = usePaintings();
   const { data: folders } = useFolders();
   const assignFolder = useAssignFolder();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const deletePainting = useDeletePainting();
   const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isContentReady, setIsContentReady] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // Calculate previous and next painting IDs (sorted by ID descending - newest to oldest)
+  const sortedPaintings = useMemo(
+    () => allPaintings?.slice().sort((a, b) => Number(b.id) - Number(a.id)) || [],
+    [allPaintings]
+  );
+  
+  // Ensure we're comparing numbers to numbers
+  const currentIndex = sortedPaintings.findIndex(p => Number(p.id) === Number(paintingId));
+  // Previous goes to newer painting (lower index in desc sorted array)
+  const previousPainting = currentIndex > 0 ? sortedPaintings[currentIndex - 1] : null;
+  // Next goes to older painting (higher index in desc sorted array)
+  const nextPainting =
+    currentIndex < sortedPaintings.length - 1 ? sortedPaintings[currentIndex + 1] : null;
 
   useEffect(() => {
     if (painting?.folder_id !== undefined) {
@@ -54,12 +72,33 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
     }
   }, [painting?.folder_id]);
 
+  // Reset loading states when painting ID changes
+  useEffect(() => {
+    setImageLoaded(false);
+    setIsContentReady(false);
+    setIsNavigating(false);
+  }, [paintingId]);
+
+  // Set content ready when painting data is loaded
+  useEffect(() => {
+    if (painting && !isLoading) {
+      const timer = setTimeout(() => setIsContentReady(true), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [painting, isLoading]);
+
   const handleImageClick = () => {
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+
+  const handleNavigation = (paintingId: number) => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    router.push(`/paintings/${paintingId}`);
   };
 
   const handleFolderChange = async (folderId: number) => {
@@ -119,24 +158,34 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
     );
   };
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <PaintingDetailSkeleton />;
   if (isError || !painting) return <ErrorMessage message="Failed to load painting" />;
 
   return (
     <div className="flex justify-center w-full min-h-screen">
       <Toaster position="top-center" />
-      <div className="container mx-auto max-w-6xl px-4">
-        <div className="mt-12 rounded-lg shadow-lg bg-[var(--background-secondary)]">
+      <div className="max-w-screen-2xl mx-auto px-4">
+        <div
+          className={`mt-8 rounded-lg shadow-lg bg-[var(--background-secondary)] transition-opacity duration-300 ${
+            isContentReady ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
           <div className="flex flex-col md:flex-row">
-            <div className="relative w-full md:w-1/2">
+            <div className="relative w-full md:w-2/3">
+              {!imageLoaded && (
+                <div className="absolute inset-0 bg-[var(--muted)] animate-pulse rounded-tl-lg rounded-tr-lg md:rounded-tr-none md:rounded-bl-lg" />
+              )}
               <CldImage
                 width="960"
                 height="600"
                 src={painting.image || ''}
                 alt={painting.title || 'Painting image'}
                 sizes="100vw"
-                className="cursor-pointer"
+                className={`cursor-pointer transition-opacity duration-500 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
                 onClick={handleImageClick}
+                onLoad={() => setImageLoaded(true)}
                 priority
               />
               {isModalOpen && painting.image && (
@@ -148,7 +197,7 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
               )}
             </div>
 
-            <div className="p-6 md:w-1/2">
+            <div className="p-6 md:w-1/3">
               <div className="mt-4 space-y-2">
                 <h2 className="text-2xl font-bold text-[var(--text-primary)]">{painting.title}</h2>
                 <p className="text-[var(--text-secondary)]">{painting.materials}</p>
@@ -166,8 +215,32 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
                 </p>
               </div>
 
-              <div className="flex gap-2 mt-4">
-                <SecondaryIconButton href="/paintings" icon={Undo2} label="Back to Paintings" />
+              {/* Navigation buttons */}
+              <div className="flex gap-2 mt-4 pb-3 border-b border-[var(--border)]">
+                <SecondaryIconButton
+                  onClick={
+                    previousPainting ? () => handleNavigation(previousPainting.id) : undefined
+                  }
+                  icon={ChevronLeft}
+                  label="Previous"
+                  disabled={!previousPainting || isNavigating}
+                />
+                <SecondaryIconButton
+                  href="/paintings"
+                  icon={Undo2}
+                  label="Back to Gallery"
+                  disabled={isNavigating}
+                />
+                <SecondaryIconButton
+                  onClick={nextPainting ? () => handleNavigation(nextPainting.id) : undefined}
+                  icon={ChevronRight}
+                  label="Next"
+                  disabled={!nextPainting || isNavigating}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2 mt-3">
                 <FacebookShareButton url={shareUrl} hashtag="#art">
                   <SecondaryIconButtonFB icon={Facebook} label="Share on Facebook" />
                 </FacebookShareButton>
@@ -263,7 +336,11 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
           </div>
         </div>
 
-        <div className="mt-8">
+        <div
+          className={`mt-8 transition-opacity duration-300 delay-150 ${
+            isContentReady ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
           <div className="bg-[var(--background-secondary)] rounded-lg shadow p-4">
             <CommentsList user={session?.user} painting_id={painting.id} />
           </div>

@@ -21,7 +21,7 @@ export const Popover: FC<PopoverProps> = ({ label, position = 'center' }) => (
       initial={{ opacity: 0, y: 10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-      className={`absolute -bottom-12 whitespace-nowrap
+      className={`absolute -bottom-12 whitespace-nowrap z-50
                  px-3 py-2 rounded-lg bg-[var(--background)] 
                  border border-violet-500/20 shadow-lg shadow-violet-500/10
                  text-sm font-medium text-[var(--text-primary)]

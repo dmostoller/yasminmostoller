@@ -11,8 +11,8 @@ interface PaintingsListProps {
 
 function PaintingsList({ paintings, lastElementRef }: PaintingsListProps) {
   return (
-    <div className="container mx-auto">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+    <div className="max-w-full mx-auto">
+      <div className="grid grid-cols-1 gap-6 lg:gap-8 xl:gap-10 2xl:gap-12 md:grid-cols-2 xl:grid-cols-3 mt-6">
         {paintings.map((painting, index) => (
           <div key={painting.id} ref={index === paintings.length - 1 ? lastElementRef : undefined}>
             <Painting

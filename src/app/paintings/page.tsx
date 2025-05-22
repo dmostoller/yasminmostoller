@@ -99,7 +99,7 @@ export default function PaintingsPage() {
   const hasMore = displayedItems < folderResults.length;
 
   return (
-    <div className="container mx-auto min-h-screen px-4 mb-8">
+    <div className="mx-auto min-h-screen px-4 mb-8">
       <div className="container mx-auto mt-12">
         <Search
           searchQ={searchQ}
