@@ -28,7 +28,7 @@ import { SecondaryButton } from './buttons/SecondaryButton';
 import { SecondaryIconButtonFB } from './buttons/SecondaryIconButtonFB';
 import { Select } from '@/components/Select';
 import CommentForm from './CommentForm';
-import PaintingDetailSkeleton from './PaintingDetailSkeleton';
+import LoadingSpinner from './LoadingSpinner';
 
 interface PaintingDetailProps {
   paintingId: number;
@@ -163,7 +163,11 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
     );
   };
 
-  if (isLoading) return <PaintingDetailSkeleton />;
+  if (isLoading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <LoadingSpinner />
+    </div>
+  );
   if (isError || !painting) return <ErrorMessage message="Failed to load painting" />;
 
   return (
@@ -171,24 +175,19 @@ export default function PaintingDetail({ paintingId }: PaintingDetailProps) {
       <Toaster position="top-center" />
       <div className="max-w-screen-2xl mx-auto px-4">
         <div
-          className={`mt-8 rounded-lg shadow-lg bg-[var(--background-secondary)] transition-opacity duration-300 ${
-            isContentReady ? 'opacity-100' : 'opacity-0'
+          className={`mt-8 rounded-lg shadow-lg bg-[var(--background-secondary)] transition-opacity duration-500 ${
+            isContentReady && imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <div className="flex flex-col md:flex-row">
             <div className="relative w-full md:w-2/3">
-              {!imageLoaded && (
-                <div className="absolute inset-0 bg-[var(--muted)] animate-pulse rounded-tl-lg rounded-tr-lg md:rounded-tr-none md:rounded-bl-lg" />
-              )}
               <CldImage
                 width="960"
                 height="600"
                 src={painting.image || ''}
                 alt={painting.title || 'Painting image'}
                 sizes="100vw"
-                className={`cursor-pointer transition-opacity duration-500 ${
-                  imageLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
+                className="cursor-pointer"
                 onClick={handleImageClick}
                 onLoad={() => setImageLoaded(true)}
                 priority

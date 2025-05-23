@@ -1,12 +1,14 @@
 export default function PaintingDetailSkeleton() {
   return (
-    <div className="flex justify-center w-full min-h-screen">
+    <div className="flex justify-center w-full min-h-screen animate-pulse">
       <div className="max-w-screen-2xl mx-auto px-4">
-        <div className="mt-8 rounded-lg shadow-lg bg-[var(--background-secondary)]">
+        <div className="mt-8 rounded-lg shadow-lg bg-[var(--background-secondary)] opacity-50">
           <div className="flex flex-col md:flex-row">
             {/* Image skeleton */}
             <div className="relative w-full md:w-2/3">
-              <div className="aspect-video bg-[var(--muted)] animate-pulse rounded-tl-lg rounded-tr-lg md:rounded-tr-none md:rounded-bl-lg" />
+              <div className="w-full" style={{ aspectRatio: '960/600' }}>
+                <div className="w-full h-full bg-[var(--muted)] animate-pulse rounded-tl-lg rounded-tr-lg md:rounded-tr-none md:rounded-bl-lg" />
+              </div>
             </div>
 
             {/* Content skeleton */}
